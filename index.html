@@ -1365,6 +1365,270 @@
     font-size: 11px;
   }
 
+  /* ---------- Slide 0: REFACE home (entry point) ---------- */
+  .s0 { background: #000; color: #fff; overflow: hidden; }
+  .s0 .s0-scroll {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 60px 0 100px; /* leaves room for the tab bar */
+  }
+  .s0 .s0-scroll::-webkit-scrollbar { display: none; }
+
+  .s0 .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px 14px;
+  }
+  .s0 .brand {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .s0 .pro-badge {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: #fff;
+    color: #000;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+
+  .s0 .chips {
+    display: flex;
+    gap: 8px;
+    padding: 0 20px 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .s0 .chips::-webkit-scrollbar { display: none; }
+  .s0 .chip {
+    flex: 0 0 auto;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.10);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: default;
+  }
+  .s0 .chip svg { display: block; }
+
+  /* AI Scanner banner — THE entry card */
+  .s0 .banner {
+    position: relative;
+    margin: 0 16px 20px;
+    aspect-ratio: 1 / 1.05;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #1a1a1a;
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
+  }
+  .s0 .banner img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+    filter: grayscale(0.2);
+  }
+  .s0 .banner .face-overlay {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 55%;
+    aspect-ratio: 3 / 4;
+    pointer-events: none;
+  }
+  .s0 .banner .face-overlay svg { width: 100%; height: 100%; display: block; overflow: visible; }
+  .s0 .banner .shape-label {
+    position: absolute;
+    top: calc(20% - 24px);
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.28);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-size: 11px;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: 0.02em;
+    z-index: 3;
+  }
+  .s0 .banner .pill-row {
+    position: absolute;
+    left: 12px; right: 12px;
+    bottom: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+  }
+  .s0 .banner .pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px 10px 10px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .s0 .banner .pill .ic {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    display: grid;
+    place-items: center;
+  }
+  .s0 .banner .try-btn {
+    padding: 14px 24px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255,255,255,0.95);
+    color: #000;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    transition: transform 0.1s ease, background 0.2s ease;
+    box-shadow: 0 6px 16px -4px rgba(0,0,0,0.5);
+  }
+  .s0 .banner .try-btn:active { transform: scale(0.97); background: #e6e6e6; }
+
+  /* horizontal row sections (Men's Hairstyles / Beards) */
+  .s0 .row-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 10px;
+  }
+  .s0 .row-head h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+  .s0 .row-head .see-all {
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+  .s0 .card-row {
+    display: flex;
+    gap: 10px;
+    padding: 0 20px 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .s0 .card-row::-webkit-scrollbar { display: none; }
+  .s0 .style-card {
+    flex: 0 0 auto;
+    width: 150px;
+    aspect-ratio: 3 / 4;
+    border-radius: 18px;
+    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    padding: 12px;
+  }
+  .s0 .style-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(60% 40% at 50% 32%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 60%),
+      linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
+    pointer-events: none;
+  }
+  /* placeholder silhouette */
+  .s0 .style-card .silhouette {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    color: rgba(255,255,255,0.28);
+  }
+  .s0 .style-card .lbl {
+    position: relative;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.15;
+    z-index: 2;
+  }
+
+  /* Tab bar — pinned floating, matches REFACE bar */
+  .s0 .tab-bar {
+    position: absolute;
+    left: 12px; right: 12px;
+    bottom: 18px;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .s0 .tab-bar .tabs {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding: 8px 6px;
+    border-radius: 32px;
+    background: rgba(20,20,20,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .s0 .tab-bar .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 6px 4px;
+    color: rgba(255,255,255,0.9);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+  .s0 .tab-bar .tab.active { color: #fff; }
+  .s0 .tab-bar .tab svg { display: block; }
+  .s0 .tab-bar .plus {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    background: rgba(20,20,20,0.72);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.08);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    flex: 0 0 auto;
+  }
+
   @media (max-width: 440px) {
     .phone { border-radius: 0; padding: 0; box-shadow: none; width: 100%; height: 100vh; }
     .phone-inner { border-radius: 0; }
@@ -1402,8 +1666,160 @@
 
     <div class="slides">
 
+      <!-- ============ SLIDE 0: REFACE home (entry point) ============ -->
+      <section class="slide s0 active" data-slide="0" aria-labelledby="s0-title">
+        <h2 id="s0-title" style="position:absolute;left:-9999px">REFACE home — AI Scanner entry</h2>
+
+        <div class="s0-scroll">
+          <div class="brand-row">
+            <div class="brand">reface</div>
+            <div class="pro-badge">PRO</div>
+          </div>
+
+          <div class="chips">
+            <div class="chip">All</div>
+            <div class="chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 0-5 2-5 5v3c0 1-1 1.5-1 3 0 1 1 1.5 2 1.5v3c0 1.5 1 3 3 3h2c2 0 3-1.5 3-3v-3c1 0 2-.5 2-1.5 0-1.5-1-2-1-3V8c0-3-2-5-5-5z"/></svg>
+              Hair &amp; Beauty
+            </div>
+            <div class="chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l3-1h6l3 1 2 4-3 2v11H4V9L1 7z"/></svg>
+              Look &amp; Style
+            </div>
+          </div>
+
+          <!-- AI Scanner banner: the ONLY interactive element -->
+          <div class="banner">
+            <img src="assets/images/slide-05-hero.webp" alt="" />
+
+            <span class="shape-label">Oval</span>
+            <div class="face-overlay">
+              <svg viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- corner brackets -->
+                <g stroke="rgba(255,255,255,0.95)" stroke-width="2" fill="none" stroke-linecap="round">
+                  <path d="M4 20 V4 H20"/><path d="M100 4 H116 V20"/>
+                  <path d="M4 140 V156 H20"/><path d="M100 156 H116 V140"/>
+                </g>
+                <!-- oval face guide + dashed proportion lines -->
+                <ellipse cx="60" cy="80" rx="42" ry="60" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" fill="none"/>
+                <g stroke="rgba(255,255,255,0.7)" stroke-width="1" stroke-dasharray="3 4" fill="none">
+                  <line x1="60" y1="20" x2="60" y2="140"/>
+                  <line x1="18" y1="70" x2="102" y2="70"/>
+                  <line x1="18" y1="90" x2="102" y2="90"/>
+                  <line x1="18" y1="110" x2="102" y2="110"/>
+                </g>
+                <!-- chin marker -->
+                <path d="M50 130 Q60 138 70 130" stroke="rgba(255,255,255,0.95)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+
+            <div class="pill-row">
+              <div class="pill">
+                <span class="ic">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2c.5 4 2 5.5 6 6-4 .5-5.5 2-6 6-.5-4-2-5.5-6-6 4-.5 5.5-2 6-6z"/>
+                  </svg>
+                </span>
+                AI Scanner
+              </div>
+              <button class="try-btn" type="button" onclick="next()">Try now!</button>
+            </div>
+          </div>
+
+          <!-- Men's Hairstyles (visual only, non-interactive) -->
+          <div class="row-head">
+            <h3>Men's Hairstyles</h3>
+            <span class="see-all">See All</span>
+          </div>
+          <div class="card-row">
+            <div class="style-card">
+              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M15 30 Q10 12 30 8 Q50 12 45 30"/>
+                <ellipse cx="30" cy="38" rx="14" ry="18" fill="currentColor" opacity="0.35"/>
+              </svg>
+              <div class="lbl">Sharp Box Fade</div>
+            </div>
+            <div class="style-card">
+              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M14 28 Q12 10 32 6 Q48 12 46 30"/>
+                <ellipse cx="30" cy="38" rx="14" ry="18" fill="currentColor" opacity="0.35"/>
+              </svg>
+              <div class="lbl">Defined Side Part</div>
+            </div>
+            <div class="style-card">
+              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M14 28 Q10 8 30 6 Q52 10 46 30"/>
+                <ellipse cx="30" cy="38" rx="14" ry="18" fill="currentColor" opacity="0.35"/>
+              </svg>
+              <div class="lbl">Slicked Back Undercut</div>
+            </div>
+            <div class="style-card">
+              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
+                <path d="M14 28 Q10 8 30 6 Q52 10 46 30"/>
+                <ellipse cx="30" cy="38" rx="14" ry="18" fill="currentColor" opacity="0.35"/>
+              </svg>
+              <div class="lbl">French Fringe</div>
+            </div>
+          </div>
+
+          <!-- Beards (visual only) -->
+          <div class="row-head">
+            <h3>Beards</h3>
+            <span class="see-all">See All</span>
+          </div>
+          <div class="card-row">
+            <div class="style-card">
+              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
+                <ellipse cx="30" cy="30" rx="12" ry="15"/>
+                <path d="M18 40 Q30 60 42 40"/>
+              </svg>
+              <div class="lbl">Full Beard</div>
+            </div>
+            <div class="style-card">
+              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
+                <ellipse cx="30" cy="30" rx="12" ry="15"/>
+                <path d="M22 40 Q30 52 38 40"/>
+              </svg>
+              <div class="lbl">Short Stubble</div>
+            </div>
+            <div class="style-card">
+              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
+                <ellipse cx="30" cy="30" rx="12" ry="15"/>
+                <path d="M20 42 Q30 55 40 42"/>
+              </svg>
+              <div class="lbl">Van Dyke</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating tab bar (visual only) -->
+        <div class="tab-bar" aria-hidden="true">
+          <div class="tabs">
+            <div class="tab active">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 4.4 2.4 6.6 7 7-4.6.4-6.4 2.6-7 7-.6-4.4-2.4-6.6-7-7 4.6-.4 6.4-2.6 7-7z"/></svg>
+              Home
+            </div>
+            <div class="tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="M17 10l4-2v8l-4-2z"/></svg>
+              AI Videos
+            </div>
+            <div class="tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10.5" r=".8" fill="currentColor"/><circle cx="15" cy="10.5" r=".8" fill="currentColor"/><path d="M8.5 14.5c1 1.5 2.2 2 3.5 2s2.5-.5 3.5-2"/></svg>
+              Face Swap
+            </div>
+            <div class="tab">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c1.5-3.5 4-5 7-5s5.5 1.5 7 5"/></svg>
+              Profile
+            </div>
+          </div>
+          <div class="plus">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+        </div>
+      </section>
+
       <!-- ============ SLIDE 1: AI Scanner intro (video bg) ============ -->
-      <section class="slide s1 active" data-slide="1" aria-labelledby="s1-title">
+      <section class="slide s1" data-slide="1" aria-labelledby="s1-title">
 
         <div class="hero">
           <video
