@@ -1,0 +1,2164 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>REFACE — AI Scanner Quiz</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2f2f4;
+    --phone-bg: #000;
+    --ink: #ffffff;
+    --ink-dim: rgba(255,255,255,0.65);
+    --ink-mute: rgba(255,255,255,0.4);
+    --stroke: rgba(255,255,255,0.12);
+    --stroke-strong: rgba(255,255,255,0.22);
+    --surface: rgba(255,255,255,0.06);
+    --surface-2: rgba(255,255,255,0.10);
+    --accent: #ffffff;
+    --accent-ink: #000000;
+    --radius-lg: 32px;
+    --radius-md: 20px;
+    --radius-sm: 14px;
+    --tap: 56px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+    color: #111;
+  }
+
+  .page-header {
+    max-width: 420px;
+    width: 100%;
+    margin: 0 auto 20px;
+    text-align: center;
+  }
+  .page-header .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6b6b6b;
+    font-weight: 600;
+  }
+  .page-header h1 {
+    font-size: 18px;
+    margin: 6px 0 0;
+    font-weight: 700;
+    color: #111;
+  }
+
+  /* ---------- Phone frame ---------- */
+  .phone {
+    width: 390px;
+    height: 844px;
+    max-width: 100%;
+    background: var(--phone-bg);
+    border-radius: 54px;
+    padding: 12px;
+    box-shadow:
+      0 0 0 2px #111,
+      0 30px 80px -20px rgba(0,0,0,0.45),
+      0 8px 24px -8px rgba(0,0,0,0.25);
+    position: relative;
+  }
+  .phone-inner {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    color: var(--ink);
+  }
+
+  /* iOS status bar mock */
+  .status-bar {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 54px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 28px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #fff;
+    z-index: 20;
+    pointer-events: none;
+  }
+  .status-bar .time { letter-spacing: -0.2px; }
+  .status-bar .indicators {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-bar .indicators svg { display: block; }
+  .notch {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 118px;
+    height: 34px;
+    background: #000;
+    border-radius: 22px;
+    z-index: 25;
+  }
+
+  /* ---------- Slide container ---------- */
+  .slides {
+    position: absolute;
+    inset: 0;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+  }
+  .slide.active { display: flex; }
+
+  /* ---------- Slide 1: AI Scanner intro (video bg) ---------- */
+  .s1 { background: #000; }
+
+  .s1 .hero {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+  }
+  .s1 .hero video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    background: #000;
+  }
+  .s1 .hero::after {
+    /* top and bottom vignette for text legibility */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 18%, rgba(0,0,0,0) 38%),
+      linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 22%, rgba(0,0,0,0) 45%);
+    pointer-events: none;
+  }
+
+  /* Top content — minimalist headline */
+  .s1 .top {
+    position: relative;
+    z-index: 10;
+    padding: 88px 28px 0;
+    text-align: center;
+  }
+  .s1 .top .kicker {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 14px;
+  }
+  .s1 h1 {
+    font-size: 34px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    font-weight: 300;
+    margin: 0;
+    color: #fff;
+  }
+  .s1 h1 strong {
+    display: block;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    font-size: 38px;
+    margin-top: 4px;
+  }
+
+  /* Bottom action area */
+  .s1 .bottom {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 10;
+    padding: 20px 24px 34px;
+  }
+
+  .cta {
+    width: 100%;
+    height: 58px;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: #000;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.2s ease;
+  }
+  .cta:active { transform: scale(0.98); background: #e6e6e6; }
+  .cta svg { flex: 0 0 auto; }
+
+  .terms {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    margin-top: 14px;
+    line-height: 1.4;
+  }
+  .terms a { color: rgba(255,255,255,0.7); text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); }
+
+  /* ---------- Nav (between phone screens) ---------- */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 22px;
+  }
+  .nav button {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 1px solid #d0d0d3;
+    background: #fff;
+    color: #111;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background 0.15s;
+  }
+  .nav button:hover { background: #eee; }
+  .nav button:disabled { opacity: 0.35; cursor: not-allowed; }
+  .nav .counter {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    min-width: 60px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Home indicator */
+  .home-ind {
+    position: absolute;
+    left: 50%;
+    bottom: 6px;
+    transform: translateX(-50%);
+    width: 134px;
+    height: 5px;
+    border-radius: 3px;
+    background: rgba(255,255,255,0.9);
+    z-index: 30;
+  }
+
+  /* ---------- Slide 2: Results — before / after showcase ---------- */
+  /* NOTE: don't set `display` here — `.slide` toggles it via `.active`.
+     Overriding it would keep this slide visible on top of the others. */
+  .s2 { background: #000; color: #fff; }
+
+  .s2 .top-bar {
+    position: relative;
+    z-index: 10;
+    padding: 68px 24px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .s2 .top-bar .pager {
+    display: flex;
+    gap: 5px;
+    flex: 1;
+  }
+  .s2 .top-bar .pager .bar {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(255,255,255,0.18);
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .s2 .top-bar .pager .bar.active {
+    background: rgba(255,255,255,0.95);
+  }
+  .s2 .top-bar .close-btn {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.10);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+
+  .s2 .stage {
+    position: relative;
+    flex: 1;
+    padding: 4px 0 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    /* if the full-bleed photo + caption + review push past the available
+       height, let this area scroll while the CTA stays fixed below */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .s2 .stage::-webkit-scrollbar { display: none; }
+
+  /* Photo card (After) — full-bleed 3:4 to match source images so no letterbox */
+  .s2 .photo-card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 0;
+    overflow: hidden;
+    background: #0a0a0a;
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
+    flex: 0 0 auto;
+  }
+  .s2 .photo-card .after-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+    background: #0a0a0a;
+  }
+  .s2 .photo-card .tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  /* Before thumb — 3:4 rounded rectangle sitting on top of the after photo */
+  .s2 .before-circle {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: 108px;
+    height: 144px; /* 3:4 aspect */
+    border-radius: 14px;
+    overflow: hidden;
+    border: 3px solid #fff;
+    background: #d9d9d9;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.55);
+    z-index: 5;
+  }
+  .s2 .before-circle img {
+    width: 100%;
+    height: 100%;
+    /* portrait 9:16 in a 3:4 window: cover crops only ~13% top/bottom,
+       so the entire face fits without tuning per pair */
+    object-fit: cover;
+    object-position: center center;
+    display: block;
+  }
+  /* Text block under card */
+  .s2 .caption {
+    padding: 14px 24px 0;
+  }
+  .s2 .caption h2 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+    line-height: 1.05;
+  }
+  .s2 .caption p {
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.55);
+    max-width: 280px;
+  }
+
+  /* Per-pair testimonial block, sits under the caption */
+  .s2 .review {
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.10);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .s2 .review .stars {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 6px;
+    color: #fff;
+  }
+  .s2 .review .stars svg { display: block; }
+  .s2 .review .author {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .s2 .review .quote {
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.78);
+    font-style: italic;
+    margin: 0;
+  }
+  .s2 .review .quote::before { content: '\201C'; margin-right: 2px; }
+  .s2 .review .quote::after  { content: '\201D'; margin-left: 2px; }
+
+  /* Pair navigation — sits under the photo card */
+  .s2 .pair-nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px 0;
+  }
+  .s2 .pair-nav button {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+  .s2 .pair-nav button:hover { background: rgba(255,255,255,0.12); }
+  .s2 .pair-nav button:active { transform: scale(0.95); }
+  .s2 .pair-nav button.primary {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+    animation: pulseGlow 2.4s ease-in-out infinite;
+  }
+  .s2 .pair-nav button.primary:hover { background: #e6e6e6; }
+  @keyframes pulseGlow {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.35); }
+    50%      { box-shadow: 0 0 0 8px rgba(255,255,255,0); }
+  }
+
+  /* Bottom CTA area */
+  .s2 .bottom {
+    padding: 20px 20px 34px;
+  }
+
+  /* ---------- Slide 3: Face analysis + shape picker (vertical scroll) ---------- */
+  .s3 {
+    background: #0a0a0a;
+    color: #fff;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .s3::-webkit-scrollbar { display: none; }
+
+  .s3 .s3-hero {
+    position: relative;
+    width: 100%;
+    background: #cfd3d6;
+    flex: 0 0 auto; /* never let the flex column squish the hero */
+  }
+  .s3 .s3-hero img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  /* soft fade at the bottom of the hero so it settles into the dark body */
+  .s3 .s3-hero::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 80px;
+    background: linear-gradient(180deg, rgba(10,10,10,0) 0%, #0a0a0a 100%);
+    pointer-events: none;
+  }
+
+  .s3 .s3-body {
+    padding: 20px 24px 8px;
+    flex: 0 0 auto;
+  }
+  .s3 .shape-picker { flex: 0 0 auto; }
+  .s3 .s3-cta-wrap { flex: 0 0 auto; }
+  .s3 .s3-body h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #fff;
+    line-height: 1.1;
+  }
+  .s3 .s3-body p {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.6);
+    max-width: 320px;
+  }
+
+  /* Horizontal shape picker */
+  .s3 .shape-picker {
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px 4px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .s3 .shape-picker::-webkit-scrollbar { display: none; }
+  .s3 .shape-picker.empty {
+    padding: 22px 24px 4px;
+  }
+  .s3 .shape-card {
+    flex: 0 0 auto;
+    width: 78px;
+    height: 78px;
+    padding: 0;
+    border-radius: 16px;
+    border: 1.5px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    font-family: inherit;
+    cursor: pointer;
+    scroll-snap-align: start;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .s3 .shape-card:active { transform: scale(0.96); }
+  .s3 .shape-card:hover { border-color: rgba(255,255,255,0.32); }
+  .s3 .shape-card.active {
+    background: #fff;
+    border-color: #fff;
+  }
+  .s3 .shape-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .s3 .shape-card.placeholder {
+    background: rgba(255,255,255,0.04);
+    border-style: dashed;
+    border-color: rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.35);
+    font-size: 22px;
+    font-weight: 300;
+    cursor: default;
+  }
+  .s3 .shape-card.placeholder:hover { border-color: rgba(255,255,255,0.15); }
+
+  .s3 .s3-cta-wrap {
+    padding: 26px 24px 40px;
+  }
+  .s3 .cta[disabled] {
+    background: rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.42);
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ---------- Slide 4: Why our AI scanner is the best (vertical list) ---------- */
+  .s4 {
+    background: #0a0a0a;
+    color: #fff;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .s4::-webkit-scrollbar { display: none; }
+
+  .s4 .s4-head {
+    padding: 76px 24px 12px;
+    flex: 0 0 auto;
+  }
+  .s4 .s4-head h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: #fff;
+    text-align: center;
+  }
+  .s4 .s4-head h2 em {
+    font-style: normal;
+    color: rgba(255,255,255,0.72);
+    font-weight: 400;
+  }
+
+  .s4 .feature-list {
+    padding: 18px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 0 0 auto;
+  }
+  .s4 .feature {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+  }
+  .s4 .feature .thumb {
+    flex: 0 0 auto;
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+    display: grid;
+    place-items: center;
+    color: rgba(255,255,255,0.9);
+  }
+  .s4 .feature .thumb svg { display: block; }
+  .s4 .feature .text { min-width: 0; }
+  .s4 .feature .title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.25;
+  }
+  .s4 .feature .desc {
+    margin: 4px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .s4 .s4-bottom {
+    padding: 22px 24px 40px;
+    flex: 0 0 auto;
+  }
+
+  /* ---------- Slide 5: Personalized analysis + hair + vibe ---------- */
+  .s5 {
+    background: #0a0a0a;
+    color: #fff;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .s5::-webkit-scrollbar { display: none; }
+
+  /* Personalized-analysis title + hero (full image, no crop) */
+  .s5 .s5-hero-title {
+    padding: 60px 24px 0;
+    text-align: center;
+    flex: 0 0 auto;
+  }
+  .s5 .s5-hero-title .kicker {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.22);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.72);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .s5 .s5-hero-title h2 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: #fff;
+  }
+  .s5 .s5-hero-title h2 strong {
+    font-weight: 800;
+    color: #fff;
+  }
+  .s5 .s5-hero {
+    margin: 18px 20px 0;
+    border-radius: 22px;
+    overflow: hidden;
+    background: #1a1a1a;
+    position: relative;
+    flex: 0 0 auto;
+  }
+  .s5 .s5-hero img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .s5 .s5-hero.placeholder {
+    aspect-ratio: 3 / 4;
+    display: grid;
+    place-items: center;
+    color: rgba(255,255,255,0.35);
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border: 1.5px dashed rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.03);
+  }
+
+  .s5 .s5-caption {
+    padding: 12px 32px 0;
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.4;
+    color: rgba(255,255,255,0.6);
+    flex: 0 0 auto;
+  }
+
+  /* Hair texture picker */
+  .s5 .s5-section {
+    padding: 28px 20px 0;
+    flex: 0 0 auto;
+  }
+  .s5 .s5-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    margin: 0 0 12px 4px;
+    letter-spacing: 0.01em;
+  }
+  .s5 .hair-picker {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .s5 .hair-card {
+    position: relative;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.10);
+    border-radius: 16px;
+    padding: 12px 8px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    color: #fff;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  }
+  .s5 .hair-card:active { transform: scale(0.97); }
+  .s5 .hair-card.active { background: #fff; color: #000; border-color: #fff; }
+  .s5 .hair-card .check {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.35);
+    background: transparent;
+    display: grid;
+    place-items: center;
+    color: transparent;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .s5 .hair-card.active .check {
+    background: #000;
+    border-color: #000;
+    color: #fff;
+  }
+  .s5 .hair-card .icon {
+    width: 76px;
+    height: 76px;
+    display: grid;
+    place-items: center;
+    color: currentColor;
+    overflow: hidden;
+  }
+  .s5 .hair-card .icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    /* white illustrations on dark background */
+    filter: invert(1) grayscale(1) brightness(1.4) contrast(1.1);
+    transition: filter 0.15s ease;
+  }
+  .s5 .hair-card.active .icon img {
+    filter: none;
+  }
+  .s5 .hair-card .name {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  /* Style-strength segmented control */
+  .s5 .strength-toggle {
+    margin-top: 14px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 14px;
+    padding: 4px;
+  }
+  .s5 .strength-toggle button {
+    border: none;
+    background: transparent;
+    padding: 12px 10px;
+    border-radius: 10px;
+    color: rgba(255,255,255,0.6);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .s5 .strength-toggle button.active {
+    background: #fff;
+    color: #000;
+  }
+
+  /* Vibe grid — 2-up, 3:4 mood-board cards */
+  .s5 .vibe-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .s5 .vibe-card {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    border-radius: 16px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.10);
+    cursor: pointer;
+    padding: 0;
+    transition: transform 0.1s ease, border-color 0.15s ease;
+  }
+  .s5 .vibe-card:active { transform: scale(0.97); }
+  .s5 .vibe-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .s5 .vibe-card.placeholder {
+    display: grid;
+    place-items: center;
+    color: rgba(255,255,255,0.32);
+    font-size: 24px;
+    font-weight: 300;
+    border-style: dashed;
+  }
+  .s5 .vibe-card.active {
+    border-color: #fff;
+    border-width: 2.5px;
+  }
+  .s5 .vibe-card .tick {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    display: none;
+    place-items: center;
+  }
+  .s5 .vibe-card.active .tick { display: grid; }
+
+  .s5 .s5-bottom {
+    padding: 30px 24px 40px;
+    flex: 0 0 auto;
+  }
+  .s5 .cta.not-ready {
+    background: rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.42);
+    cursor: not-allowed;
+  }
+  .s5 .cta.not-ready:active { transform: none; background: rgba(255,255,255,0.14); }
+
+  /* Toast banner slides down from the top when Continue is pressed too early */
+  .s5-toast {
+    position: absolute;
+    top: 66px;
+    left: 20px;
+    right: 20px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: #fff;
+    color: #000;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    z-index: 40;
+    box-shadow: 0 10px 30px -6px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: translateY(-14px);
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .s5-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---------- Slide 6: Add a photo → Start analyzing ---------- */
+  .s6 {
+    background: #0a0a0a;
+    color: #fff;
+    /* IMPORTANT: don't set position/display here — .slide already provides
+       position: absolute; inset: 0 as the containing block. Overriding it
+       collapses the slide and makes the bottom sheet appear at the top. */
+  }
+  .s6 .s6-inner {
+    position: absolute;
+    inset: 0;
+    padding: 80px 24px 34px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .s6 h2 {
+    margin: 0 0 36px;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: #fff;
+  }
+
+  /* Big drop tile */
+  .s6 .drop-tile {
+    width: 78%;
+    max-width: 300px;
+    aspect-ratio: 1 / 1;
+    border-radius: 32px;
+    border: 2px dashed rgba(255,255,255,0.30);
+    background: rgba(255,255,255,0.03);
+    display: grid;
+    place-items: center;
+    color: rgba(255,255,255,0.75);
+    cursor: pointer;
+    font-family: inherit;
+    padding: 0;
+    overflow: hidden;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+    position: relative;
+  }
+  .s6 .drop-tile:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.5); }
+  .s6 .drop-tile:active { transform: scale(0.98); }
+  .s6 .drop-tile .plus svg { width: 46px; height: 46px; }
+  .s6 .drop-tile img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 30px;
+  }
+  .s6 .drop-tile.filled {
+    border-style: solid;
+    border-color: #fff;
+    background: transparent;
+  }
+  .s6 .drop-tile .change-badge {
+    position: absolute;
+    left: 50%; bottom: 12px;
+    transform: translateX(-50%);
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    display: none;
+  }
+  .s6 .drop-tile.filled .change-badge { display: inline-block; }
+  .s6 .drop-tile.filled .plus { display: none; }
+
+  /* Bottom sheet */
+  .s6 .sheet-backdrop {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: none;
+    z-index: 20;
+  }
+  .s6 .sheet-backdrop.show { display: block; }
+  .s6 .sheet {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: #141414;
+    border-top-left-radius: 26px;
+    border-top-right-radius: 26px;
+    padding: 22px 20px calc(24px + env(safe-area-inset-bottom, 0));
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    z-index: 21;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+  .s6 .sheet.show { transform: translateY(0); }
+  .s6 .sheet .grabber {
+    width: 42px; height: 4px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 3px;
+    margin: 0 auto 16px;
+  }
+  .s6 .sheet .sheet-title {
+    text-align: center;
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 12px;
+    letter-spacing: 0.02em;
+  }
+  .s6 .sheet-btn {
+    width: 100%;
+    padding: 16px 18px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background 0.15s ease;
+  }
+  .s6 .sheet-btn:hover { background: rgba(255,255,255,0.10); }
+  .s6 .sheet-btn:last-child { margin-bottom: 0; }
+  .s6 .sheet-btn .glyph {
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.10);
+    display: grid;
+    place-items: center;
+  }
+
+  .s6 .s6-bottom {
+    margin-top: auto;
+    width: 100%;
+  }
+  .s6 .cta.not-ready {
+    background: rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.42);
+    cursor: not-allowed;
+  }
+  .s6 .cta.not-ready:active { transform: none; background: rgba(255,255,255,0.14); }
+
+  /* ---------- Slide 7: Analyzing → Paywall ---------- */
+  .s7 { background: #0a0a0a; color: #fff; }
+  .s7 .s7-view { position: absolute; inset: 0; display: none; flex-direction: column; }
+  .s7 .s7-view.active { display: flex; }
+
+  /* ---- Analyzing view ---- */
+  .s7 .analyze-view { padding: 76px 22px 30px; }
+  .s7 .analyze-view h2 {
+    margin: 0 0 18px;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #fff;
+    text-align: center;
+  }
+  .s7 .analyze-view h2 .dots { color: rgba(255,255,255,0.5); font-weight: 400; }
+
+  .s7 .photo-wrap {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border-radius: 24px;
+    overflow: hidden;
+    background: #111;
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
+    margin-bottom: 22px;
+  }
+  .s7 .photo-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    filter: brightness(0.55) grayscale(0.15);
+  }
+  .s7 .photo-wrap .grid-lines {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(90deg, transparent 0%, transparent 33%, rgba(255,255,255,0.08) 33%, rgba(255,255,255,0.08) 34%, transparent 34%),
+      linear-gradient(90deg, transparent 0%, transparent 66%, rgba(255,255,255,0.08) 66%, rgba(255,255,255,0.08) 67%, transparent 67%),
+      linear-gradient(180deg, transparent 0%, transparent 33%, rgba(255,255,255,0.08) 33%, rgba(255,255,255,0.08) 34%, transparent 34%),
+      linear-gradient(180deg, transparent 0%, transparent 66%, rgba(255,255,255,0.08) 66%, rgba(255,255,255,0.08) 67%, transparent 67%);
+    pointer-events: none;
+  }
+  .s7 .photo-wrap .scan-beam {
+    position: absolute; left: 0; right: 0; height: 60px;
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0) 100%);
+    animation: scan7 2.6s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+    pointer-events: none;
+    filter: blur(2px);
+  }
+  @keyframes scan7 {
+    0%   { top: -60px; }
+    100% { top: 100%; }
+  }
+  .s7 .photo-wrap .pct {
+    position: absolute; inset: 0;
+    display: grid;
+    place-items: center;
+    font-size: 68px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.6);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .s7 .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .s7 .checklist .item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: rgba(255,255,255,0.36);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease, color 0.35s ease;
+  }
+  .s7 .checklist .item.done {
+    opacity: 1;
+    transform: translateY(0);
+    color: #fff;
+  }
+  .s7 .checklist .item .bullet {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.2);
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    color: transparent;
+    transition: background 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+  }
+  .s7 .checklist .item.done .bullet {
+    background: #fff;
+    border-color: #fff;
+    color: #000;
+  }
+
+  /* ---- Paywall view ---- */
+  .s7 .paywall-view { background: #0a0a0a; }
+  .s7 .paywall-view .close-x {
+    position: absolute;
+    top: 62px; left: 20px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255,255,255,0.14);
+    color: #fff;
+    display: grid; place-items: center;
+    z-index: 5;
+    cursor: pointer;
+  }
+  .s7 .paywall-view .pw-logo {
+    position: absolute;
+    inset: 0 0 44% 0;
+    background: #0a0a0a;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .s7 .paywall-view .pw-logo .mark {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding-bottom: 24px;
+    color: #fff;
+  }
+  .s7 .paywall-view .pw-logo .mark .spark {
+    width: 92px;
+    height: 92px;
+    display: grid;
+    place-items: center;
+    border-radius: 28px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .s7 .paywall-view .pw-logo .mark .word {
+    font-size: 38px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    color: #fff;
+  }
+  .s7 .paywall-view .pw-logo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(10,10,10,0) 70%, #0a0a0a 100%);
+    pointer-events: none;
+  }
+  .s7 .paywall-view .pw-title {
+    position: absolute;
+    left: 24px; right: 24px;
+    bottom: 44%;
+    padding-bottom: 24px;
+    text-align: center;
+    z-index: 3;
+  }
+  .s7 .paywall-view .pw-title h2 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    color: #fff;
+  }
+  .s7 .paywall-view .pw-title h2 strong {
+    display: block;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .s7 .paywall-view .pw-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 14px;
+  }
+  .s7 .paywall-view .pw-dots span {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+  }
+  .s7 .paywall-view .pw-dots span.active { background: #fff; }
+
+  .s7 .paywall-view .pw-bottom {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 20px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 4;
+  }
+  .s7 .plan {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1.5px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    font-family: inherit;
+    color: #fff;
+    text-align: left;
+    position: relative;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .s7 .plan.active {
+    border-color: #fff;
+    border-width: 2px;
+    padding: 13.5px 15.5px;
+  }
+  .s7 .plan .radio {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255,255,255,0.3);
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    background: transparent;
+  }
+  .s7 .plan.active .radio {
+    background: #fff;
+    border-color: #fff;
+  }
+  .s7 .plan.active .radio::after {
+    content: '';
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #000;
+  }
+  .s7 .plan .name { flex: 1; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .s7 .plan .price { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+  .s7 .plan .tag {
+    position: absolute;
+    top: -9px;
+    right: 14px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    background: #fff;
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .s7 .paywall-view .pw-cta {
+    width: 100%;
+    height: 56px;
+    border-radius: 999px;
+    border: none;
+    background: #fff;
+    color: #000;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: transform 0.1s ease, background 0.2s ease;
+  }
+  .s7 .paywall-view .pw-cta:active { transform: scale(0.98); background: #e6e6e6; }
+  .s7 .paywall-view .pw-fine {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-top: 6px;
+  }
+  .s7 .paywall-view .pw-links {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
+  }
+  .s7 .paywall-view .pw-links a {
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 11px;
+  }
+
+  @media (max-width: 440px) {
+    .phone { border-radius: 0; padding: 0; box-shadow: none; width: 100%; height: 100vh; }
+    .phone-inner { border-radius: 0; }
+    .home-ind { display: none; }
+    .notch { display: none; }
+    .status-bar { display: none; }
+    .page-header, .nav { display: none; }
+    body { padding: 0; background: #000; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="eyebrow">REFACE · Prototype</div>
+  <h1>In-app quiz — AI Scanner</h1>
+</div>
+
+<div class="phone" role="application" aria-label="REFACE quiz prototype">
+  <div class="phone-inner">
+
+    <!-- iOS notch + status bar mock -->
+    <div class="notch" aria-hidden="true"></div>
+    <div class="status-bar" aria-hidden="true">
+      <span class="time">9:41</span>
+      <span class="indicators">
+        <!-- signal -->
+        <svg width="18" height="10" viewBox="0 0 18 10" fill="none"><rect x="0" y="6" width="3" height="4" rx="0.5" fill="#fff"/><rect x="5" y="4" width="3" height="6" rx="0.5" fill="#fff"/><rect x="10" y="2" width="3" height="8" rx="0.5" fill="#fff"/><rect x="15" y="0" width="3" height="10" rx="0.5" fill="#fff"/></svg>
+        <!-- wifi -->
+        <svg width="16" height="11" viewBox="0 0 16 11" fill="none"><path d="M8 10.2a1 1 0 100-2 1 1 0 000 2z" fill="#fff"/><path d="M2 4.6a9 9 0 0112 0" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/><path d="M4.4 6.9a5.5 5.5 0 017.2 0" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <!-- battery -->
+        <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x="0.5" y="0.5" width="22" height="11" rx="3" stroke="#fff" opacity="0.5"/><rect x="2" y="2" width="19" height="8" rx="1.5" fill="#fff"/><rect x="24" y="4" width="2" height="4" rx="1" fill="#fff" opacity="0.5"/></svg>
+      </span>
+    </div>
+
+    <div class="slides">
+
+      <!-- ============ SLIDE 1: AI Scanner intro (video bg) ============ -->
+      <section class="slide s1 active" data-slide="1" aria-labelledby="s1-title">
+
+        <div class="hero">
+          <video
+            src="assets/video/slide-01-bg.mp4"
+            poster="assets/video/slide-01-poster.jpg"
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="auto"
+            disablepictureinpicture
+            aria-hidden="true"></video>
+        </div>
+
+        <div class="bottom">
+          <button class="cta" type="button" onclick="next()">
+            Start analyzing
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 2: Results — before/after ============ -->
+      <section class="slide s2" data-slide="2" aria-labelledby="s2-title">
+
+        <div class="top-bar">
+          <div class="pager" id="s2-pager" aria-label="Before/after pairs"></div>
+          <button class="close-btn" type="button" aria-label="Close" onclick="prev()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+          </button>
+        </div>
+
+        <div class="stage">
+          <div class="photo-card">
+            <img class="after-img" id="s2-after" src="assets/images/pair-01-after.webp" alt="AI-recommended look" />
+            <div class="before-circle" aria-label="Original photo">
+              <img id="s2-before" src="assets/images/pair-01-before.webp" alt="" />
+            </div>
+          </div>
+
+          <div class="pair-nav" aria-label="Switch before/after pair">
+            <button type="button" aria-label="Previous pair" onclick="pairPrev()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <button type="button" class="primary" aria-label="Next pair" onclick="pairNext()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+
+          <div class="caption">
+            <h2 id="s2-title">Results</h2>
+            <p>Already used by over 1 million users</p>
+
+            <div class="review" id="s2-review" aria-live="polite">
+              <div class="stars" aria-label="5 out of 5 stars">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <div class="author" id="s2-review-author">Adelina</div>
+              <p class="quote" id="s2-review-quote">I have never seen myself from this side, a very beautiful image</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bottom">
+          <button class="cta" type="button" onclick="next()">
+            Continue
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 3: Face analysis + shape picker ============ -->
+      <section class="slide s3" data-slide="3" aria-labelledby="s3-title">
+        <div class="s3-hero">
+          <img src="assets/images/slide-03-hero.webp" alt="AI face analysis with nose impression, projection, and nasal-angle readouts" />
+        </div>
+
+        <div class="s3-body">
+          <h2 id="s3-title">Face analysis</h2>
+          <p>Choose the face shape option that best matches yours</p>
+        </div>
+
+        <div class="shape-picker" id="s3-picker" role="radiogroup" aria-label="Face shape">
+          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-01" onclick="pickShape(this)">
+            <img src="assets/images/shape-01.webp" alt="Face shape 1" />
+          </button>
+          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-02" onclick="pickShape(this)">
+            <img src="assets/images/shape-02.webp" alt="Face shape 2" />
+          </button>
+          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-03" onclick="pickShape(this)">
+            <img src="assets/images/shape-03.webp" alt="Face shape 3" />
+          </button>
+          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-04" onclick="pickShape(this)">
+            <img src="assets/images/shape-04.webp" alt="Face shape 4" />
+          </button>
+          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-05" onclick="pickShape(this)">
+            <img src="assets/images/shape-05.webp" alt="Face shape 5" />
+          </button>
+          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-06" onclick="pickShape(this)">
+            <img src="assets/images/shape-06.webp" alt="Face shape 6" />
+          </button>
+        </div>
+
+        <div class="s3-cta-wrap">
+          <button class="cta" id="s3-cta" type="button" disabled onclick="next()">
+            Continue
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 4: Why our AI scanner is the best ============ -->
+      <section class="slide s4" data-slide="4" aria-labelledby="s4-title">
+        <div class="s4-head">
+          <h2 id="s4-title">Why our AI scanner is the best at choosing a style for you — <em>it analyzes:</em></h2>
+        </div>
+
+        <div class="feature-list">
+
+          <div class="feature">
+            <div class="thumb" aria-hidden="true">
+              <!-- 3 heads / cultural -->
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="6" cy="8" r="2.2"/><path d="M2.5 15c.4-2 1.8-3.2 3.5-3.2S9.1 13 9.5 15"/>
+                <circle cx="12" cy="7" r="2.6"/><path d="M8 15.4c.5-2.4 2.2-3.7 4-3.7s3.5 1.3 4 3.7"/>
+                <circle cx="18" cy="8" r="2.2"/><path d="M14.5 15c.4-2 1.8-3.2 3.5-3.2s3.1 1.2 3.5 3.2"/>
+              </svg>
+            </div>
+            <div class="text">
+              <p class="title">Cultural beauty standards</p>
+              <p class="desc">Adapts to regional and societal ideals</p>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="thumb" aria-hidden="true">
+              <!-- profile face harmony -->
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 3c-3 0-5 2-5 5v3c0 1-1 1.5-1 3 0 1 1 1.5 2 1.5v3c0 1.5 1 3 3 3h4"/>
+                <circle cx="10" cy="10" r="0.6" fill="currentColor"/>
+                <path d="M13 12c-.5 0-1 .3-1 1s.4 1 1 1"/>
+              </svg>
+            </div>
+            <div class="text">
+              <p class="title">The harmony of your face</p>
+              <p class="desc">How your features work together</p>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="thumb" aria-hidden="true">
+              <!-- 2x2 grid of faces -->
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="8" height="8" rx="1.5"/>
+                <rect x="13" y="3" width="8" height="8" rx="1.5"/>
+                <rect x="3" y="13" width="8" height="8" rx="1.5"/>
+                <rect x="13" y="13" width="8" height="8" rx="1.5"/>
+                <circle cx="7" cy="7" r="1.2"/><circle cx="17" cy="7" r="1.2"/>
+                <circle cx="7" cy="17" r="1.2"/><circle cx="17" cy="17" r="1.2"/>
+              </svg>
+            </div>
+            <div class="text">
+              <p class="title">How each feature impacts your appearance</p>
+              <p class="desc">Detailed breakdowns on each facial feature</p>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="thumb" aria-hidden="true">
+              <!-- globe -->
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="9"/>
+                <path d="M3 12h18"/>
+                <path d="M12 3c2.5 2.8 3.8 5.8 3.8 9S14.5 21.2 12 21c-2.5.2-3.8-5.8-3.8-9S9.5 5.8 12 3z"/>
+              </svg>
+            </div>
+            <div class="text">
+              <p class="title">Ethnic background</p>
+              <p class="desc">Considers unique facial traits and characteristics common to your demographic</p>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="thumb" aria-hidden="true">
+              <!-- person centered w/ chevrons -->
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="9" r="3"/>
+                <path d="M6 19c1.2-2.4 3.4-4 6-4s4.8 1.6 6 4"/>
+                <path d="M4 12l-1.5-1.5L4 9"/>
+                <path d="M20 12l1.5-1.5L20 9"/>
+              </svg>
+            </div>
+            <div class="text">
+              <p class="title">Personal preferences</p>
+              <p class="desc">Takes into account your individual style and preferences</p>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="thumb" aria-hidden="true">
+              <!-- lifestyle: gauge + text -->
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 15a9 9 0 0118 0"/>
+                <path d="M12 15l3-4"/>
+                <circle cx="12" cy="15" r="1" fill="currentColor" stroke="none"/>
+                <path d="M6 20h12"/>
+              </svg>
+            </div>
+            <div class="text">
+              <p class="title">Lifestyle factors</p>
+              <p class="desc">Considers diet, climate, stress, sleep, and habits</p>
+            </div>
+          </div>
+
+          <div class="feature">
+            <div class="thumb" aria-hidden="true">
+              <!-- aging: clock + face -->
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8.5"/>
+                <path d="M12 7v5l3 2"/>
+                <path d="M8 16c1-1 2.4-1.5 4-1.5s3 .5 4 1.5"/>
+              </svg>
+            </div>
+            <div class="text">
+              <p class="title">Natural aging patterns</p>
+              <p class="desc">Considers how skin, bone, and fat distribution change over time</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="s4-bottom">
+          <button class="cta" type="button" onclick="next()">
+            Continue
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 5: Personalized analysis + hair + vibe ============ -->
+      <section class="slide s5" data-slide="5" aria-labelledby="s5-title">
+
+        <!-- Validation toast that appears at the top on early Continue tap -->
+        <div class="s5-toast" id="s5-toast" role="status" aria-live="polite">Select all items before proceeding</div>
+
+        <!-- 1. Hero title + analysis image (uncropped) -->
+        <div class="s5-hero-title">
+          <span class="kicker">Personalized analysis</span>
+          <h2 id="s5-title"><strong>Your complete</strong> facial analysis</h2>
+        </div>
+
+        <div class="s5-hero" id="s5-hero">
+          <img src="assets/images/slide-05-hero.webp" alt="Personalized facial analysis with skin evenness, texture, hydration, elasticity and symmetry readouts" />
+        </div>
+
+        <p class="s5-caption">Thanks to this data, our scanner can pick up a completely new image for you</p>
+
+        <!-- 2. Hair texture picker -->
+        <div class="s5-section">
+          <p class="s5-label">Select your natural hair texture</p>
+          <div class="hair-picker" role="radiogroup" aria-label="Hair texture">
+
+            <button type="button" class="hair-card" role="radio" aria-checked="false" data-hair="straight" onclick="pickHair(this)">
+              <span class="check" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>
+              </span>
+              <span class="icon"><img src="assets/images/hair-straight.webp" alt="" /></span>
+              <span class="name">Straight</span>
+            </button>
+
+            <button type="button" class="hair-card" role="radio" aria-checked="false" data-hair="wavy" onclick="pickHair(this)">
+              <span class="check" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>
+              </span>
+              <span class="icon"><img src="assets/images/hair-wavy.webp" alt="" /></span>
+              <span class="name">Wavy &amp; Curly</span>
+            </button>
+
+            <button type="button" class="hair-card" role="radio" aria-checked="false" data-hair="coily" onclick="pickHair(this)">
+              <span class="check" aria-hidden="true">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg>
+              </span>
+              <span class="icon"><img src="assets/images/hair-coily.webp" alt="" /></span>
+              <span class="name">Coily</span>
+            </button>
+
+          </div>
+        </div>
+
+        <!-- 3. Style-strength segmented toggle (own section) -->
+        <div class="s5-section">
+          <p class="s5-label">How natural should the change feel?</p>
+          <div class="strength-toggle" role="radiogroup" aria-label="Style change strength">
+            <button type="button" role="radio" aria-checked="false" data-strength="bold" onclick="pickStrength(this)">
+              brighter and more<br/>effective changes
+            </button>
+            <button type="button" role="radio" aria-checked="false" data-strength="natural" onclick="pickStrength(this)">
+              more natural
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Vibe grid -->
+        <div class="s5-section">
+          <p class="s5-label" style="text-align:center; margin-bottom: 14px;">Choose your vibe</p>
+          <div class="vibe-grid" role="radiogroup" aria-label="Vibe">
+            <button type="button" class="vibe-card" data-vibe="v1" onclick="pickVibe(this)">
+              <span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>
+              <img src="assets/images/vibe-01.webp" alt="Vibe 1" />
+            </button>
+            <button type="button" class="vibe-card" data-vibe="v2" onclick="pickVibe(this)">
+              <span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>
+              <img src="assets/images/vibe-02.webp" alt="Vibe 2" />
+            </button>
+            <button type="button" class="vibe-card" data-vibe="v3" onclick="pickVibe(this)">
+              <span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>
+              <img src="assets/images/vibe-03.webp" alt="Vibe 3" />
+            </button>
+            <button type="button" class="vibe-card" data-vibe="v4" onclick="pickVibe(this)">
+              <span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>
+              <img src="assets/images/vibe-04.webp" alt="Vibe 4" />
+            </button>
+            <button type="button" class="vibe-card" data-vibe="v5" onclick="pickVibe(this)">
+              <span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>
+              <img src="assets/images/vibe-05.webp" alt="Vibe 5" />
+            </button>
+            <button type="button" class="vibe-card" data-vibe="v6" onclick="pickVibe(this)">
+              <span class="tick" aria-hidden="true"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>
+              <img src="assets/images/vibe-06.webp" alt="Vibe 6" />
+            </button>
+          </div>
+        </div>
+
+        <div class="s5-bottom">
+          <button class="cta not-ready" id="s5-cta" type="button" onclick="tryS5Next()">
+            Continue
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 6: Add a photo → Start analyzing ============ -->
+      <section class="slide s6" data-slide="6" aria-labelledby="s6-title">
+        <div class="s6-inner">
+          <h2 id="s6-title">Select a photo</h2>
+
+          <button class="drop-tile" id="s6-tile" type="button" onclick="openS6Sheet()" aria-label="Add photo">
+            <span class="plus">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </span>
+            <img id="s6-preview" alt="" />
+            <span class="change-badge">Change photo</span>
+          </button>
+
+          <div class="s6-bottom">
+            <button class="cta not-ready" id="s6-cta" type="button" onclick="onS6Continue()">
+              Start analyzing
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bottom sheet with the two source options -->
+        <div class="sheet-backdrop" id="s6-backdrop" onclick="closeS6Sheet()"></div>
+        <div class="sheet" id="s6-sheet" role="dialog" aria-label="Add a photo">
+          <div class="grabber"></div>
+          <div class="sheet-title">Add a photo</div>
+
+          <label class="sheet-btn" for="s6-camera">
+            <span class="glyph">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 8h3l1.5-2h7L17 8h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/>
+                <circle cx="12" cy="13.5" r="3.5"/>
+              </svg>
+            </span>
+            Take a selfie
+          </label>
+
+          <label class="sheet-btn" for="s6-file">
+            <span class="glyph">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2"/>
+                <circle cx="9" cy="10" r="1.8"/>
+                <path d="M3 17l5-5 4 4 3-3 6 6"/>
+              </svg>
+            </span>
+            Upload from gallery
+          </label>
+
+          <input id="s6-camera" type="file" accept="image/*" capture="user" style="display:none" onchange="onS6File(event)" />
+          <input id="s6-file"   type="file" accept="image/*"                 style="display:none" onchange="onS6File(event)" />
+        </div>
+      </section>
+
+      <!-- ============ SLIDE 7: Analyzing → Paywall ============ -->
+      <section class="slide s7" data-slide="7" aria-labelledby="s7-title">
+
+        <!-- View A: analyzing -->
+        <div class="s7-view analyze-view active" id="s7-analyze">
+          <h2 id="s7-title">Analyzing<span class="dots">...</span></h2>
+
+          <div class="photo-wrap">
+            <img id="s7-photo" alt="" />
+            <div class="grid-lines" aria-hidden="true"></div>
+            <div class="scan-beam" aria-hidden="true"></div>
+            <div class="pct" id="s7-pct">0%</div>
+          </div>
+
+          <div class="checklist" id="s7-checklist">
+            <div class="item" data-at="10"><span class="bullet"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>Ethnic background</div>
+            <div class="item" data-at="25"><span class="bullet"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>The harmony of your face</div>
+            <div class="item" data-at="42"><span class="bullet"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>Cultural beauty standards</div>
+            <div class="item" data-at="58"><span class="bullet"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>Personal preferences</div>
+            <div class="item" data-at="72"><span class="bullet"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span>Lifestyle factors</div>
+          </div>
+        </div>
+
+        <!-- View B: paywall (opens at 78%) -->
+        <div class="s7-view paywall-view" id="s7-paywall">
+          <button class="close-x" type="button" aria-label="Close paywall" onclick="closePaywall()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6l-12 12"/></svg>
+          </button>
+
+          <div class="pw-logo" aria-label="REFACE">
+            <div class="mark">
+              <span class="spark" aria-hidden="true">
+                <!-- 4-point sparkle, mirrors the REFACE app icon -->
+                <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2c.6 4.2 2.2 6.4 6.4 7-4.2.6-5.8 2.8-6.4 7-.6-4.2-2.2-6.4-6.4-7 4.2-.6 5.8-2.8 6.4-7z" fill="currentColor"/>
+                  <path d="M19 3.5c.25 1.5 1 2.25 2.5 2.5-1.5.25-2.25 1-2.5 2.5-.25-1.5-1-2.25-2.5-2.5 1.5-.25 2.25-1 2.5-2.5z" fill="currentColor"/>
+                </svg>
+              </span>
+              <span class="word">REFACE</span>
+            </div>
+          </div>
+
+          <div class="pw-title">
+            <h2>See yourself in<strong>Any Hairstyle</strong></h2>
+            <div class="pw-dots" aria-hidden="true">
+              <span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+          </div>
+
+          <div class="pw-bottom">
+            <button type="button" class="plan active" data-plan="annual" onclick="pickPlan(this)">
+              <span class="tag">Most popular</span>
+              <span class="radio"></span>
+              <span class="name">Annual</span>
+              <span class="price">$39.99</span>
+            </button>
+            <button type="button" class="plan" data-plan="weekly" onclick="pickPlan(this)">
+              <span class="radio"></span>
+              <span class="name">1 week</span>
+              <span class="price">$5.99</span>
+            </button>
+
+            <button type="button" class="pw-cta" onclick="next()">Continue</button>
+
+            <p class="pw-fine">Auto-renewable subscription  ·  Cancel anytime</p>
+            <div class="pw-links">
+              <a href="#" onclick="return false">Terms of Use</a>
+              <a href="#" onclick="return false">Restore</a>
+              <a href="#" onclick="return false">Privacy Notice</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="home-ind" aria-hidden="true"></div>
+  </div>
+</div>
+
+<nav class="nav" aria-label="Slide navigation">
+  <button id="prevBtn" onclick="prev()" aria-label="Previous slide" disabled>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+  </button>
+  <div class="counter"><span id="cur">1</span> / <span id="tot">1</span></div>
+  <button id="nextBtn" onclick="next()" aria-label="Next slide">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+  </button>
+</nav>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let idx = 0;
+  const curEl = document.getElementById('cur');
+  const totEl = document.getElementById('tot');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  totEl.textContent = total;
+
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+    curEl.textContent = idx + 1;
+    prevBtn.disabled = idx === 0;
+    nextBtn.disabled = idx === total - 1;
+    // slide 7 kicks off the analyzing animation whenever it becomes active
+    if (slides[idx] && slides[idx].classList.contains('s7')) {
+      // defer so any DOM swap paints first
+      setTimeout(() => { try { startAnalyze(); } catch (_) {} }, 30);
+    }
+  }
+  function next() { if (idx < total - 1) { idx++; render(); } }
+  function prev() { if (idx > 0) { idx--; render(); } }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft') prev();
+  });
+
+  // Kick autoplay in browsers that stall muted <video autoplay>
+  document.querySelectorAll('video').forEach(v => {
+    v.muted = true;
+    const tryPlay = () => v.play().catch(() => {});
+    tryPlay();
+    v.addEventListener('canplay', tryPlay, { once: true });
+    document.addEventListener('click', tryPlay, { once: true });
+  });
+
+  // ---- Slide 2: before/after pair carousel ----
+  // Add new pairs here — they auto-render in the pager
+  const pairs = [
+    {
+      before: 'assets/images/pair-01-before.webp',
+      after:  'assets/images/pair-01-after.webp',
+      author: 'Adelina',
+      quote:  'I have never seen myself from this side, a very beautiful image',
+    },
+    {
+      before: 'assets/images/pair-02-before.webp',
+      after:  'assets/images/pair-02-after.webp',
+      author: 'Olivia',
+      quote:  "I have dreamed of transforming myself for a long time, it's so cool that the AI scanner from REFACE saw me",
+    },
+    {
+      before: 'assets/images/pair-03-before.webp',
+      after:  'assets/images/pair-03-after.webp',
+      author: 'Emma',
+      quote:  'I did not believe in this AI at all before using this technology! Perfectly picked a new look for me!',
+    },
+  ];
+  let pairIdx = 0;
+  const afterEl  = document.getElementById('s2-after');
+  const beforeEl = document.getElementById('s2-before');
+  const pagerEl  = document.getElementById('s2-pager');
+
+  function renderPager() {
+    pagerEl.innerHTML = '';
+    pairs.forEach((_, i) => {
+      const b = document.createElement('div');
+      b.className = 'bar' + (i === pairIdx ? ' active' : '');
+      b.onclick = () => { pairIdx = i; renderPair(); };
+      pagerEl.appendChild(b);
+    });
+  }
+  const reviewAuthorEl = document.getElementById('s2-review-author');
+  const reviewQuoteEl  = document.getElementById('s2-review-quote');
+  function renderPair() {
+    const p = pairs[pairIdx];
+    afterEl.src  = p.after;
+    beforeEl.src = p.before;
+    afterEl.style.objectPosition  = p.afterPos  || '';
+    beforeEl.style.objectPosition = p.beforePos || '';
+    if (reviewAuthorEl) reviewAuthorEl.textContent = p.author || '';
+    if (reviewQuoteEl)  reviewQuoteEl.textContent  = p.quote  || '';
+    renderPager();
+  }
+  function pairNext() { pairIdx = (pairIdx + 1) % pairs.length; renderPair(); }
+  function pairPrev() { pairIdx = (pairIdx - 1 + pairs.length) % pairs.length; renderPair(); }
+
+  // swipe on the photo card
+  const stage = document.querySelector('.s2 .stage');
+  let touchStartX = null;
+  if (stage) {
+    stage.addEventListener('touchstart', e => touchStartX = e.touches[0].clientX, { passive: true });
+    stage.addEventListener('touchend', e => {
+      if (touchStartX === null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if (Math.abs(dx) > 40) (dx < 0 ? pairNext : pairPrev)();
+      touchStartX = null;
+    });
+    // click halves also switch (desktop preview)
+    stage.addEventListener('click', (e) => {
+      if (e.target.closest('.bar') || e.target.closest('button')) return;
+      const rect = stage.getBoundingClientRect();
+      (e.clientX - rect.left > rect.width / 2 ? pairNext : pairPrev)();
+    });
+  }
+  renderPager();
+
+  // ---- Slide 6: add-a-photo ----
+  const s6Tile    = document.getElementById('s6-tile');
+  const s6Preview = document.getElementById('s6-preview');
+  const s6Cta     = document.getElementById('s6-cta');
+  const s6Sheet   = document.getElementById('s6-sheet');
+  const s6Back    = document.getElementById('s6-backdrop');
+
+  function openS6Sheet() {
+    // Only open the sheet when the tile is empty — once filled, the tile
+    // itself acts as a "change photo" trigger for the same sheet.
+    s6Back.classList.add('show');
+    requestAnimationFrame(() => s6Sheet.classList.add('show'));
+  }
+  function closeS6Sheet() {
+    s6Sheet.classList.remove('show');
+    setTimeout(() => s6Back.classList.remove('show'), 260);
+  }
+  let userPhotoUrl = null;
+  function onS6File(e) {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    userPhotoUrl = URL.createObjectURL(f);
+    s6Preview.src = userPhotoUrl;
+    s6Tile.classList.add('filled');
+    s6Cta.classList.remove('not-ready');
+    closeS6Sheet();
+    // reset both inputs so re-picking the same file still fires change
+    document.getElementById('s6-camera').value = '';
+    document.getElementById('s6-file').value = '';
+  }
+  function onS6Continue() {
+    if (s6Cta.classList.contains('not-ready')) return;
+    next(); // render() will kick off the slide-7 analyze animation
+  }
+
+  // ---- Slide 7: analyzing → paywall ----
+  const s7Photo    = document.getElementById('s7-photo');
+  const s7Pct      = document.getElementById('s7-pct');
+  const s7Analyze  = document.getElementById('s7-analyze');
+  const s7Paywall  = document.getElementById('s7-paywall');
+  const s7Items    = document.querySelectorAll('#s7-checklist .item');
+  let s7Timer = null;
+
+  function startAnalyze() {
+    // reset UI
+    s7Analyze.classList.add('active');
+    s7Paywall.classList.remove('active');
+    s7Items.forEach(i => i.classList.remove('done'));
+    s7Pct.textContent = '0%';
+
+    // put the user's photo into the analyzing card
+    if (userPhotoUrl) {
+      s7Photo.src = userPhotoUrl;
+    }
+
+    // Count 0 → 78 in ~5s, revealing checklist items along the way
+    clearInterval(s7Timer);
+    let pct = 0;
+    const paywallAt = 78;
+    s7Timer = setInterval(() => {
+      pct += 1;
+      s7Pct.textContent = pct + '%';
+      // reveal any item whose threshold we've crossed
+      s7Items.forEach(i => {
+        const at = +i.dataset.at;
+        if (pct >= at) i.classList.add('done');
+      });
+      if (pct >= paywallAt) {
+        clearInterval(s7Timer);
+        openPaywall();
+      }
+    }, 60);
+  }
+
+  function openPaywall() {
+    s7Paywall.classList.add('active');
+    // analyze view fades under the paywall; keep it in DOM but no longer active
+    s7Analyze.classList.remove('active');
+  }
+  function closePaywall() {
+    // In real life this dismisses. In the prototype we hop back to analyze so
+    // the user can replay, or just move forward.
+    next();
+  }
+  function pickPlan(btn) {
+    document.querySelectorAll('.s7 .plan').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  // ---- Slide 5: hair / strength / vibe pickers + Continue validation ----
+  const s5State = { hair: null, strength: null, vibe: null };
+  const s5Cta   = document.getElementById('s5-cta');
+  const s5Toast = document.getElementById('s5-toast');
+  let s5ToastTimer = null;
+
+  function s5Ready() {
+    return s5State.hair && s5State.strength && s5State.vibe;
+  }
+  function s5Refresh() {
+    if (s5Ready()) s5Cta.classList.remove('not-ready');
+    else           s5Cta.classList.add('not-ready');
+  }
+  function s5ShowToast() {
+    if (!s5Toast) return;
+    s5Toast.classList.add('show');
+    clearTimeout(s5ToastTimer);
+    s5ToastTimer = setTimeout(() => s5Toast.classList.remove('show'), 2400);
+  }
+  function tryS5Next() {
+    if (!s5Ready()) { s5ShowToast(); return; }
+    next();
+  }
+
+  function pickHair(btn) {
+    document.querySelectorAll('.s5 .hair-card').forEach(c => {
+      c.classList.remove('active');
+      c.setAttribute('aria-checked', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-checked', 'true');
+    s5State.hair = btn.dataset.hair;
+    s5Refresh();
+  }
+  function pickStrength(btn) {
+    document.querySelectorAll('.s5 .strength-toggle button').forEach(b => {
+      b.classList.remove('active');
+      b.setAttribute('aria-checked', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-checked', 'true');
+    s5State.strength = btn.dataset.strength;
+    s5Refresh();
+  }
+  function pickVibe(btn) {
+    // single-select: clear the rest, mark this one
+    document.querySelectorAll('.s5 .vibe-card').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    s5State.vibe = btn.dataset.vibe;
+    s5Refresh();
+  }
+
+  // ---- Slide 3: face shape picker ----
+  let selectedShape = null;
+  const s3Cta = document.getElementById('s3-cta');
+  function pickShape(btn) {
+    document.querySelectorAll('.s3 .shape-card').forEach(c => {
+      c.classList.remove('active');
+      c.setAttribute('aria-checked', 'false');
+    });
+    btn.classList.add('active');
+    btn.setAttribute('aria-checked', 'true');
+    selectedShape = btn.dataset.shape;
+    s3Cta.disabled = false;
+    btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }
+</script>
+</body>
+</html>
+
+</body></html>
