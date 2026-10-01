@@ -131,12 +131,27 @@
   }
   .slide.active { display: flex; }
 
-  /* ---------- Slide 1: AI Scanner intro (video bg) ---------- */
+  /* ---------- Slide 1: AI Scanner intro (video + scroll + sticky CTA) ---------- */
   .s1 { background: #000; }
 
-  .s1 .hero {
+  /* Scrollable area that holds the video and the blurb below it */
+  .s1 .s1-scroll {
     position: absolute;
     inset: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* leave room for the sticky CTA at the bottom */
+    padding-bottom: 120px;
+  }
+  .s1 .s1-scroll::-webkit-scrollbar { display: none; }
+
+  .s1 .hero {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    max-height: 844px;
     overflow: hidden;
   }
   .s1 .hero video {
@@ -148,19 +163,20 @@
     background: #000;
   }
   .s1 .hero::after {
-    /* top and bottom vignette for text legibility */
+    /* top vignette so overlaid title stays readable over the video */
     content: '';
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 18%, rgba(0,0,0,0) 38%),
-      linear-gradient(0deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 22%, rgba(0,0,0,0) 45%);
+      linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.35) 18%, rgba(0,0,0,0) 40%),
+      linear-gradient(0deg, #000 0%, rgba(0,0,0,0.4) 10%, rgba(0,0,0,0) 25%);
     pointer-events: none;
   }
 
-  /* Top content — minimalist headline */
+  /* Title overlaid on the video (same spot as before) */
   .s1 .top {
-    position: relative;
+    position: absolute;
+    top: 0; left: 0; right: 0;
     z-index: 10;
     padding: 88px 28px 0;
     text-align: center;
@@ -188,13 +204,27 @@
     font-size: 38px;
     margin-top: 4px;
   }
+  .s1 .s1-blurb-wrap {
+    background: #000;
+    padding: 32px 28px 24px;
+    text-align: center;
+  }
+  .s1 .s1-blurb {
+    margin: 0 auto;
+    max-width: 320px;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.82);
+  }
 
-  /* Bottom action area */
+  /* Sticky-looking CTA pinned at the bottom of the slide */
   .s1 .bottom {
     position: absolute;
     left: 0; right: 0; bottom: 0;
-    z-index: 10;
+    z-index: 20;
     padding: 20px 24px 34px;
+    background: linear-gradient(0deg, #000 60%, rgba(0,0,0,0) 100%);
   }
 
   .cta {
@@ -439,6 +469,7 @@
   .s2 .review .quote::before { content: '\201C'; margin-right: 2px; }
   .s2 .review .quote::after  { content: '\201D'; margin-left: 2px; }
 
+
   /* Pair navigation — sits under the photo card */
   .s2 .pair-nav {
     display: flex;
@@ -531,21 +562,21 @@
     max-width: 320px;
   }
 
-  /* Horizontal shape picker */
-  .s3 .shape-picker {
+  /* Horizontal shape picker — shared between slide 3 and slide 5 */
+  .shape-picker {
     display: flex;
     gap: 12px;
-    padding: 20px 24px 4px;
+    padding: 20px 0 4px;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
   }
-  .s3 .shape-picker::-webkit-scrollbar { display: none; }
-  .s3 .shape-picker.empty {
-    padding: 22px 24px 4px;
-  }
-  .s3 .shape-card {
+  /* slide 3 version adds horizontal padding so cards don't touch screen edge */
+  .s3 .shape-picker { padding: 20px 24px 4px; }
+  .shape-picker::-webkit-scrollbar { display: none; }
+  .shape-picker.empty { padding-top: 22px; }
+  .shape-card {
     flex: 0 0 auto;
     width: 78px;
     height: 78px;
@@ -562,19 +593,19 @@
     place-items: center;
     overflow: hidden;
   }
-  .s3 .shape-card:active { transform: scale(0.96); }
-  .s3 .shape-card:hover { border-color: rgba(255,255,255,0.32); }
-  .s3 .shape-card.active {
+  .shape-card:active { transform: scale(0.96); }
+  .shape-card:hover { border-color: rgba(255,255,255,0.32); }
+  .shape-card.active {
     background: #fff;
     border-color: #fff;
   }
-  .s3 .shape-card img {
+  .shape-card img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
   }
-  .s3 .shape-card.placeholder {
+  .shape-card.placeholder {
     background: rgba(255,255,255,0.04);
     border-style: dashed;
     border-color: rgba(255,255,255,0.15);
@@ -583,7 +614,7 @@
     font-weight: 300;
     cursor: default;
   }
-  .s3 .shape-card.placeholder:hover { border-color: rgba(255,255,255,0.15); }
+  .shape-card.placeholder:hover { border-color: rgba(255,255,255,0.15); }
 
   .s3 .s3-cta-wrap {
     padding: 26px 24px 40px;
@@ -897,8 +928,14 @@
   .s5 .vibe-card.active .tick { display: grid; }
 
   .s5 .s5-bottom {
-    padding: 30px 24px 40px;
+    position: sticky;
+    bottom: 0;
+    padding: 18px 24px 30px;
     flex: 0 0 auto;
+    /* fade from transparent to black so scrolling content disappears
+       cleanly behind the pinned CTA */
+    background: linear-gradient(0deg, #0a0a0a 55%, rgba(10,10,10,0) 100%);
+    z-index: 15;
   }
   .s5 .cta.not-ready {
     background: rgba(255,255,255,0.14);
@@ -943,70 +980,157 @@
   .s6 .s6-inner {
     position: absolute;
     inset: 0;
-    padding: 80px 24px 34px;
+    padding: 76px 20px 24px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     text-align: center;
+    overflow-y: auto;
+    scrollbar-width: none;
   }
+  .s6 .s6-inner::-webkit-scrollbar { display: none; }
   .s6 h2 {
-    margin: 0 0 36px;
-    font-size: 26px;
+    margin: 0 0 18px;
+    font-size: 24px;
     font-weight: 800;
     letter-spacing: -0.02em;
     line-height: 1.15;
     color: #fff;
   }
 
-  /* Big drop tile */
+  /* Drop area holds either one big "+" tile OR a 3-slot grid */
+  .s6 .drop-area {
+    width: 100%;
+    display: grid;
+    place-items: center;
+  }
   .s6 .drop-tile {
-    width: 78%;
-    max-width: 300px;
+    width: 100%;
+    max-width: 240px;
     aspect-ratio: 1 / 1;
-    border-radius: 32px;
+    border-radius: 24px;
     border: 2px dashed rgba(255,255,255,0.30);
     background: rgba(255,255,255,0.03);
     display: grid;
     place-items: center;
     color: rgba(255,255,255,0.75);
     cursor: pointer;
-    font-family: inherit;
-    padding: 0;
-    overflow: hidden;
     transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
     position: relative;
+    overflow: hidden;
   }
   .s6 .drop-tile:hover { background: rgba(255,255,255,0.07); border-color: rgba(255,255,255,0.5); }
   .s6 .drop-tile:active { transform: scale(0.98); }
   .s6 .drop-tile .plus svg { width: 46px; height: 46px; }
-  .s6 .drop-tile img {
+
+  /* 3-slot grid shown once at least one photo is picked */
+  .s6 .slots {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    width: 100%;
+    cursor: pointer;
+  }
+  .s6 .slot {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    border-radius: 14px;
+    border: 1.5px dashed rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.04);
+    display: grid;
+    place-items: center;
+    color: rgba(255,255,255,0.4);
+    overflow: hidden;
+  }
+  .s6 .slot .n {
+    position: absolute;
+    top: 8px; left: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.55);
+    z-index: 2;
+  }
+  .s6 .slot img {
     width: 100%; height: 100%;
     object-fit: cover;
     display: block;
-    border-radius: 30px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
   }
-  .s6 .drop-tile.filled {
+  .s6 .slot.filled {
     border-style: solid;
     border-color: #fff;
-    background: transparent;
   }
-  .s6 .drop-tile .change-badge {
-    position: absolute;
-    left: 50%; bottom: 12px;
-    transform: translateX(-50%);
-    padding: 6px 12px;
+  .s6 .slot.filled img { opacity: 1; }
+  .s6 .slot.filled .n {
+    background: #fff;
+    color: #000;
+    padding: 2px 6px;
     border-radius: 999px;
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    display: none;
+    top: 6px; left: 6px;
   }
-  .s6 .drop-tile.filled .change-badge { display: inline-block; }
-  .s6 .drop-tile.filled .plus { display: none; }
+
+  /* instructions block */
+  .s6 .s6-instructions {
+    margin-top: 22px;
+    text-align: center;
+  }
+  .s6 .s6-instructions .method {
+    margin: 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.78);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    line-height: 1.3;
+  }
+  .s6 .s6-instructions .icn { display: inline-grid; place-items: center; color: rgba(255,255,255,0.9); }
+  .s6 .s6-instructions .divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+    color: rgba(255,255,255,0.45);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .s6 .s6-instructions .divider::before,
+  .s6 .s6-instructions .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(255,255,255,0.12);
+  }
+
+  /* example row */
+  .s6 .example-row { margin-top: 18px; text-align: left; }
+  .s6 .example-row .example-label {
+    margin: 0 0 8px 2px;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+  }
+  .s6 .examples {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .s6 .example {
+    aspect-ratio: 3 / 4;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #1a1a1a;
+  }
+  .s6 .example img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
 
   /* Bottom sheet */
   .s6 .sheet-backdrop {
@@ -1365,269 +1489,37 @@
     font-size: 11px;
   }
 
-  /* ---------- Slide 0: REFACE home (entry point) ---------- */
-  .s0 { background: #000; color: #fff; overflow: hidden; }
-  .s0 .s0-scroll {
+  /* ---------- Slide 0: REFACE home screenshot with Try-now hotspot ---------- */
+  .s0 { background: #000; overflow: hidden; }
+  .s0 .s0-screenshot {
     position: absolute;
     inset: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding: 60px 0 100px; /* leaves room for the tab bar */
-  }
-  .s0 .s0-scroll::-webkit-scrollbar { display: none; }
-
-  .s0 .brand-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px 14px;
-  }
-  .s0 .brand {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    color: #fff;
-  }
-  .s0 .pro-badge {
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: #fff;
-    color: #000;
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-  }
-
-  .s0 .chips {
-    display: flex;
-    gap: 8px;
-    padding: 0 20px 18px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .s0 .chips::-webkit-scrollbar { display: none; }
-  .s0 .chip {
-    flex: 0 0 auto;
-    padding: 9px 16px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.10);
-    color: #fff;
-    font-size: 13px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    cursor: default;
-  }
-  .s0 .chip svg { display: block; }
-
-  /* AI Scanner banner — THE entry card */
-  .s0 .banner {
-    position: relative;
-    margin: 0 16px 20px;
-    aspect-ratio: 1 / 1.05;
-    border-radius: 22px;
-    overflow: hidden;
-    background: #1a1a1a;
-    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.6);
-  }
-  .s0 .banner img {
-    width: 100%; height: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    object-position: center 20%;
+    object-position: center top;
     display: block;
-    filter: grayscale(0.2);
-  }
-  .s0 .banner .face-overlay {
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 55%;
-    aspect-ratio: 3 / 4;
+    user-select: none;
     pointer-events: none;
   }
-  .s0 .banner .face-overlay svg { width: 100%; height: 100%; display: block; overflow: visible; }
-  .s0 .banner .shape-label {
+  /* Invisible tap target positioned over the "Try now!" button in the screenshot */
+  .s0 .s0-try-hotspot {
     position: absolute;
-    top: calc(20% - 24px);
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 3px 12px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.15);
-    border: 1px solid rgba(255,255,255,0.28);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    font-size: 11px;
-    font-weight: 600;
-    color: #fff;
-    letter-spacing: 0.02em;
-    z-index: 3;
-  }
-  .s0 .banner .pill-row {
-    position: absolute;
-    left: 12px; right: 12px;
-    bottom: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-  }
-  .s0 .banner .pill {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 10px 14px 10px 10px;
-    border-radius: 999px;
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-  .s0 .banner .pill .ic {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.12);
-    display: grid;
-    place-items: center;
-  }
-  .s0 .banner .try-btn {
-    padding: 14px 24px;
-    border-radius: 999px;
+    /* percentages tuned to the 903x1954 REFACE home screenshot */
+    right: 3.5%;
+    top: 42%;
+    width: 30%;
+    height: 6.5%;
     border: none;
-    background: rgba(255,255,255,0.95);
-    color: #000;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 800;
-    letter-spacing: -0.01em;
+    background: transparent;
+    border-radius: 999px;
     cursor: pointer;
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    transition: transform 0.1s ease, background 0.2s ease;
-    box-shadow: 0 6px 16px -4px rgba(0,0,0,0.5);
+    padding: 0;
+    z-index: 5;
+    /* uncomment to see hitbox during layout tweaks:
+       background: rgba(0,255,0,0.25); */
   }
-  .s0 .banner .try-btn:active { transform: scale(0.97); background: #e6e6e6; }
-
-  /* horizontal row sections (Men's Hairstyles / Beards) */
-  .s0 .row-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 20px 10px;
-  }
-  .s0 .row-head h3 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 800;
-    color: #fff;
-    letter-spacing: -0.01em;
-  }
-  .s0 .row-head .see-all {
-    font-size: 13px;
-    color: rgba(255,255,255,0.6);
-  }
-  .s0 .card-row {
-    display: flex;
-    gap: 10px;
-    padding: 0 20px 6px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .s0 .card-row::-webkit-scrollbar { display: none; }
-  .s0 .style-card {
-    flex: 0 0 auto;
-    width: 150px;
-    aspect-ratio: 3 / 4;
-    border-radius: 18px;
-    background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
-    padding: 12px;
-  }
-  .s0 .style-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(60% 40% at 50% 32%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 60%),
-      linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.55) 100%);
-    pointer-events: none;
-  }
-  /* placeholder silhouette */
-  .s0 .style-card .silhouette {
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60%;
-    color: rgba(255,255,255,0.28);
-  }
-  .s0 .style-card .lbl {
-    position: relative;
-    font-size: 14px;
-    font-weight: 700;
-    color: #fff;
-    line-height: 1.15;
-    z-index: 2;
-  }
-
-  /* Tab bar — pinned floating, matches REFACE bar */
-  .s0 .tab-bar {
-    position: absolute;
-    left: 12px; right: 12px;
-    bottom: 18px;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-  .s0 .tab-bar .tabs {
-    flex: 1;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    padding: 8px 6px;
-    border-radius: 32px;
-    background: rgba(20,20,20,0.72);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.08);
-  }
-  .s0 .tab-bar .tab {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 3px;
-    padding: 6px 4px;
-    color: rgba(255,255,255,0.9);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.01em;
-  }
-  .s0 .tab-bar .tab.active { color: #fff; }
-  .s0 .tab-bar .tab svg { display: block; }
-  .s0 .tab-bar .plus {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    background: rgba(20,20,20,0.72);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255,255,255,0.08);
-    display: grid;
-    place-items: center;
-    color: #fff;
-    flex: 0 0 auto;
-  }
+  .s0 .s0-try-hotspot:active { background: rgba(255,255,255,0.15); }
 
   @media (max-width: 440px) {
     .phone { border-radius: 0; padding: 0; box-shadow: none; width: 100%; height: 100vh; }
@@ -1666,177 +1558,40 @@
 
     <div class="slides">
 
-      <!-- ============ SLIDE 0: REFACE home (entry point) ============ -->
+      <!-- ============ SLIDE 0: REFACE home (screenshot + Try now hotspot) ============ -->
       <section class="slide s0 active" data-slide="0" aria-labelledby="s0-title">
-        <h2 id="s0-title" style="position:absolute;left:-9999px">REFACE home — AI Scanner entry</h2>
-
-        <div class="s0-scroll">
-          <div class="brand-row">
-            <div class="brand">reface</div>
-            <div class="pro-badge">PRO</div>
-          </div>
-
-          <div class="chips">
-            <div class="chip">All</div>
-            <div class="chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 0-5 2-5 5v3c0 1-1 1.5-1 3 0 1 1 1.5 2 1.5v3c0 1.5 1 3 3 3h2c2 0 3-1.5 3-3v-3c1 0 2-.5 2-1.5 0-1.5-1-2-1-3V8c0-3-2-5-5-5z"/></svg>
-              Hair &amp; Beauty
-            </div>
-            <div class="chip">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l3-1h6l3 1 2 4-3 2v11H4V9L1 7z"/></svg>
-              Look &amp; Style
-            </div>
-          </div>
-
-          <!-- AI Scanner banner: the ONLY interactive element -->
-          <div class="banner">
-            <img src="assets/images/slide-05-hero.webp" alt="" />
-
-            <span class="shape-label">Oval</span>
-            <div class="face-overlay">
-              <svg viewBox="0 0 120 160" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <!-- corner brackets -->
-                <g stroke="rgba(255,255,255,0.95)" stroke-width="2" fill="none" stroke-linecap="round">
-                  <path d="M4 20 V4 H20"/><path d="M100 4 H116 V20"/>
-                  <path d="M4 140 V156 H20"/><path d="M100 156 H116 V140"/>
-                </g>
-                <!-- oval face guide + dashed proportion lines -->
-                <ellipse cx="60" cy="80" rx="42" ry="60" stroke="rgba(255,255,255,0.9)" stroke-width="1.5" fill="none"/>
-                <g stroke="rgba(255,255,255,0.7)" stroke-width="1" stroke-dasharray="3 4" fill="none">
-                  <line x1="60" y1="20" x2="60" y2="140"/>
-                  <line x1="18" y1="70" x2="102" y2="70"/>
-                  <line x1="18" y1="90" x2="102" y2="90"/>
-                  <line x1="18" y1="110" x2="102" y2="110"/>
-                </g>
-                <!-- chin marker -->
-                <path d="M50 130 Q60 138 70 130" stroke="rgba(255,255,255,0.95)" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-              </svg>
-            </div>
-
-            <div class="pill-row">
-              <div class="pill">
-                <span class="ic">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2c.5 4 2 5.5 6 6-4 .5-5.5 2-6 6-.5-4-2-5.5-6-6 4-.5 5.5-2 6-6z"/>
-                  </svg>
-                </span>
-                AI Scanner
-              </div>
-              <button class="try-btn" type="button" onclick="next()">Try now!</button>
-            </div>
-          </div>
-
-          <!-- Men's Hairstyles (visual only, non-interactive) -->
-          <div class="row-head">
-            <h3>Men's Hairstyles</h3>
-            <span class="see-all">See All</span>
-          </div>
-          <div class="card-row">
-            <div class="style-card">
-              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
-                <path d="M15 30 Q10 12 30 8 Q50 12 45 30"/>
-                <ellipse cx="30" cy="38" rx="14" ry="18" fill="currentColor" opacity="0.35"/>
-              </svg>
-              <div class="lbl">Sharp Box Fade</div>
-            </div>
-            <div class="style-card">
-              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
-                <path d="M14 28 Q12 10 32 6 Q48 12 46 30"/>
-                <ellipse cx="30" cy="38" rx="14" ry="18" fill="currentColor" opacity="0.35"/>
-              </svg>
-              <div class="lbl">Defined Side Part</div>
-            </div>
-            <div class="style-card">
-              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
-                <path d="M14 28 Q10 8 30 6 Q52 10 46 30"/>
-                <ellipse cx="30" cy="38" rx="14" ry="18" fill="currentColor" opacity="0.35"/>
-              </svg>
-              <div class="lbl">Slicked Back Undercut</div>
-            </div>
-            <div class="style-card">
-              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
-                <path d="M14 28 Q10 8 30 6 Q52 10 46 30"/>
-                <ellipse cx="30" cy="38" rx="14" ry="18" fill="currentColor" opacity="0.35"/>
-              </svg>
-              <div class="lbl">French Fringe</div>
-            </div>
-          </div>
-
-          <!-- Beards (visual only) -->
-          <div class="row-head">
-            <h3>Beards</h3>
-            <span class="see-all">See All</span>
-          </div>
-          <div class="card-row">
-            <div class="style-card">
-              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
-                <ellipse cx="30" cy="30" rx="12" ry="15"/>
-                <path d="M18 40 Q30 60 42 40"/>
-              </svg>
-              <div class="lbl">Full Beard</div>
-            </div>
-            <div class="style-card">
-              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
-                <ellipse cx="30" cy="30" rx="12" ry="15"/>
-                <path d="M22 40 Q30 52 38 40"/>
-              </svg>
-              <div class="lbl">Short Stubble</div>
-            </div>
-            <div class="style-card">
-              <svg class="silhouette" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1.4">
-                <ellipse cx="30" cy="30" rx="12" ry="15"/>
-                <path d="M20 42 Q30 55 40 42"/>
-              </svg>
-              <div class="lbl">Van Dyke</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Floating tab bar (visual only) -->
-        <div class="tab-bar" aria-hidden="true">
-          <div class="tabs">
-            <div class="tab active">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c.6 4.4 2.4 6.6 7 7-4.6.4-6.4 2.6-7 7-.6-4.4-2.4-6.6-7-7 4.6-.4 6.4-2.6 7-7z"/></svg>
-              Home
-            </div>
-            <div class="tab">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="14" height="12" rx="2"/><path d="M17 10l4-2v8l-4-2z"/></svg>
-              AI Videos
-            </div>
-            <div class="tab">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="9" cy="10.5" r=".8" fill="currentColor"/><circle cx="15" cy="10.5" r=".8" fill="currentColor"/><path d="M8.5 14.5c1 1.5 2.2 2 3.5 2s2.5-.5 3.5-2"/></svg>
-              Face Swap
-            </div>
-            <div class="tab">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="3.5"/><path d="M5 20c1.5-3.5 4-5 7-5s5.5 1.5 7 5"/></svg>
-              Profile
-            </div>
-          </div>
-          <div class="plus">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-          </div>
-        </div>
+        <h2 id="s0-title" style="position:absolute;left:-9999px">REFACE home — tap Try now to start the quiz</h2>
+        <img class="s0-screenshot" src="assets/images/slide-00-home.webp" alt="REFACE home screen" />
+        <button class="s0-try-hotspot" type="button" aria-label="Try now" onclick="next()"></button>
       </section>
 
       <!-- ============ SLIDE 1: AI Scanner intro (video bg) ============ -->
       <section class="slide s1" data-slide="1" aria-labelledby="s1-title">
 
-        <div class="hero">
-          <video
-            src="assets/video/slide-01-bg.mp4"
-            poster="assets/video/slide-01-poster.jpg"
-            autoplay
-            muted
-            loop
-            playsinline
-            preload="auto"
-            disablepictureinpicture
-            aria-hidden="true"></video>
-        </div>
+        <div class="s1-scroll">
+          <div class="hero">
+            <video
+              src="assets/video/slide-01-bg.mp4"
+              poster="assets/video/slide-01-poster.jpg"
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="auto"
+              disablepictureinpicture
+              aria-hidden="true"></video>
 
-        <div class="top">
-          <div class="kicker">REFACE</div>
-          <h1 id="s1-title">The best<strong>AI SCANNER</strong></h1>
+            <!-- Title overlaid on top of the video, as before -->
+            <div class="top">
+              <div class="kicker">REFACE</div>
+              <h1 id="s1-title">The best<strong>AI SCANNER</strong></h1>
+            </div>
+          </div>
+
+          <!-- Description paragraph lives below the video, revealed on scroll -->
+          <div class="s1-blurb-wrap">
+            <p class="s1-blurb">This scanner can analyze your face with incredible precision; using built-in capabilities and data from top stylists, it will select a new look for you and create a transformation that highlights your best features.</p>
+          </div>
         </div>
 
         <div class="bottom">
@@ -1860,6 +1615,7 @@
         <div class="stage">
           <div class="photo-card">
             <img class="after-img" id="s2-after" src="assets/images/pair-01-after.webp" alt="AI-recommended look" />
+            <video class="after-img" id="s2-after-video" muted loop playsinline preload="metadata" style="display:none"></video>
             <div class="before-circle" aria-label="Original photo">
               <img id="s2-before" src="assets/images/pair-01-before.webp" alt="" />
             </div>
@@ -1900,40 +1656,15 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 3: Face analysis + shape picker ============ -->
+      <!-- ============ SLIDE 3: Face analysis hero only ============ -->
       <section class="slide s3" data-slide="3" aria-labelledby="s3-title">
+        <h2 id="s3-title" style="position:absolute;left:-9999px">Face analysis</h2>
         <div class="s3-hero">
           <img src="assets/images/slide-03-hero.webp" alt="AI face analysis with nose impression, projection, and nasal-angle readouts" />
         </div>
 
-        <div class="s3-body">
-          <h2 id="s3-title">Face analysis</h2>
-          <p>Choose the face shape option that best matches yours</p>
-        </div>
-
-        <div class="shape-picker" id="s3-picker" role="radiogroup" aria-label="Face shape">
-          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-01" onclick="pickShape(this)">
-            <img src="assets/images/shape-01.webp" alt="Face shape 1" />
-          </button>
-          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-02" onclick="pickShape(this)">
-            <img src="assets/images/shape-02.webp" alt="Face shape 2" />
-          </button>
-          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-03" onclick="pickShape(this)">
-            <img src="assets/images/shape-03.webp" alt="Face shape 3" />
-          </button>
-          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-04" onclick="pickShape(this)">
-            <img src="assets/images/shape-04.webp" alt="Face shape 4" />
-          </button>
-          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-05" onclick="pickShape(this)">
-            <img src="assets/images/shape-05.webp" alt="Face shape 5" />
-          </button>
-          <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-06" onclick="pickShape(this)">
-            <img src="assets/images/shape-06.webp" alt="Face shape 6" />
-          </button>
-        </div>
-
         <div class="s3-cta-wrap">
-          <button class="cta" id="s3-cta" type="button" disabled onclick="next()">
+          <button class="cta" type="button" onclick="next()">
             Continue
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
           </button>
@@ -2118,7 +1849,32 @@
           </div>
         </div>
 
-        <!-- 3. Style-strength segmented toggle (own section) -->
+        <!-- 3. Face shape picker (duplicate of slide 3, inline here as a step) -->
+        <div class="s5-section">
+          <p class="s5-label">Face analysis — choose the face shape option that best matches yours</p>
+          <div class="shape-picker" role="radiogroup" aria-label="Face shape (slide 5)">
+            <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-01" onclick="pickShapeS5(this)">
+              <img src="assets/images/shape-01.webp" alt="Face shape 1" />
+            </button>
+            <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-02" onclick="pickShapeS5(this)">
+              <img src="assets/images/shape-02.webp" alt="Face shape 2" />
+            </button>
+            <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-03" onclick="pickShapeS5(this)">
+              <img src="assets/images/shape-03.webp" alt="Face shape 3" />
+            </button>
+            <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-04" onclick="pickShapeS5(this)">
+              <img src="assets/images/shape-04.webp" alt="Face shape 4" />
+            </button>
+            <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-05" onclick="pickShapeS5(this)">
+              <img src="assets/images/shape-05.webp" alt="Face shape 5" />
+            </button>
+            <button type="button" class="shape-card" role="radio" aria-checked="false" data-shape="shape-06" onclick="pickShapeS5(this)">
+              <img src="assets/images/shape-06.webp" alt="Face shape 6" />
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. Style-strength segmented toggle (own section) -->
         <div class="s5-section">
           <p class="s5-label">How natural should the change feel?</p>
           <div class="strength-toggle" role="radiogroup" aria-label="Style change strength">
@@ -2170,18 +1926,43 @@
         </div>
       </section>
 
-      <!-- ============ SLIDE 6: Add a photo → Start analyzing ============ -->
+      <!-- ============ SLIDE 6: Add 3 photos → Start analyzing ============ -->
       <section class="slide s6" data-slide="6" aria-labelledby="s6-title">
         <div class="s6-inner">
-          <h2 id="s6-title">Select a photo</h2>
+          <h2 id="s6-title">Select your photos</h2>
 
-          <button class="drop-tile" id="s6-tile" type="button" onclick="openS6Sheet()" aria-label="Add photo">
-            <span class="plus">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
-            </span>
-            <img id="s6-preview" alt="" />
-            <span class="change-badge">Change photo</span>
-          </button>
+          <!-- Big upload tile; grid of 3 slots once something is picked -->
+          <div class="drop-area" id="s6-drop" onclick="openS6Sheet()">
+            <div class="drop-tile" id="s6-tile" role="button" tabindex="0" aria-label="Add photos">
+              <span class="plus">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+              </span>
+            </div>
+            <div class="slots" id="s6-slots" hidden>
+              <div class="slot" data-slot="0"><span class="n">1</span><img alt="" /></div>
+              <div class="slot" data-slot="1"><span class="n">2</span><img alt="" /></div>
+              <div class="slot" data-slot="2"><span class="n">3</span><img alt="" /></div>
+            </div>
+          </div>
+
+          <div class="s6-instructions">
+            <p class="method"><span class="icn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2z"/><circle cx="12" cy="13.5" r="3.5"/></svg>
+            </span> Take photos one by one with your camera</p>
+            <div class="divider"><span>or</span></div>
+            <p class="method"><span class="icn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.8"/><path d="M3 17l5-5 4 4 3-3 6 6"/></svg>
+            </span> Upload 3 photos from different angles</p>
+          </div>
+
+          <div class="example-row">
+            <p class="example-label">Example photos</p>
+            <div class="examples">
+              <div class="example"><img src="assets/images/example-01.webp" alt="Example — left profile" /></div>
+              <div class="example"><img src="assets/images/example-02.webp" alt="Example — front" /></div>
+              <div class="example"><img src="assets/images/example-03.webp" alt="Example — right profile" /></div>
+            </div>
+          </div>
 
           <div class="s6-bottom">
             <button class="cta not-ready" id="s6-cta" type="button" onclick="onS6Continue()">
@@ -2191,11 +1972,11 @@
           </div>
         </div>
 
-        <!-- Bottom sheet with the two source options -->
+        <!-- Bottom sheet: two upload sources -->
         <div class="sheet-backdrop" id="s6-backdrop" onclick="closeS6Sheet()"></div>
-        <div class="sheet" id="s6-sheet" role="dialog" aria-label="Add a photo">
+        <div class="sheet" id="s6-sheet" role="dialog" aria-label="Add photos">
           <div class="grabber"></div>
-          <div class="sheet-title">Add a photo</div>
+          <div class="sheet-title">Add 3 photos</div>
 
           <label class="sheet-btn" for="s6-camera">
             <span class="glyph">
@@ -2204,7 +1985,7 @@
                 <circle cx="12" cy="13.5" r="3.5"/>
               </svg>
             </span>
-            Take a selfie
+            Take a photo with camera
           </label>
 
           <label class="sheet-btn" for="s6-file">
@@ -2215,11 +1996,11 @@
                 <path d="M3 17l5-5 4 4 3-3 6 6"/>
               </svg>
             </span>
-            Upload from gallery
+            Upload from gallery (3 photos)
           </label>
 
-          <input id="s6-camera" type="file" accept="image/*" capture="user" style="display:none" onchange="onS6File(event)" />
-          <input id="s6-file"   type="file" accept="image/*"                 style="display:none" onchange="onS6File(event)" />
+          <input id="s6-camera" type="file" accept="image/*" capture="user"      style="display:none" onchange="onS6File(event)" />
+          <input id="s6-file"   type="file" accept="image/*" multiple           style="display:none" onchange="onS6File(event)" />
         </div>
       </section>
 
@@ -2355,8 +2136,9 @@
   // Add new pairs here — they auto-render in the pager
   const pairs = [
     {
-      before: 'assets/images/pair-01-before.webp',
-      after:  'assets/images/pair-01-after.webp',
+      before:     'assets/images/pair-01-before.webp',
+      after:      'assets/images/pair-01-after.webp',
+      afterVideo: 'assets/video/pair-01-after.mp4',
       author: 'Adelina',
       quote:  'I have never seen myself from this side, a very beautiful image',
     },
@@ -2389,9 +2171,24 @@
   }
   const reviewAuthorEl = document.getElementById('s2-review-author');
   const reviewQuoteEl  = document.getElementById('s2-review-quote');
+  const afterVideoEl = document.getElementById('s2-after-video');
   function renderPair() {
     const p = pairs[pairIdx];
-    afterEl.src  = p.after;
+    // after-photo: either an image or a looping video
+    if (p.afterVideo) {
+      afterEl.style.display = 'none';
+      afterVideoEl.style.display = '';
+      if (afterVideoEl.getAttribute('src') !== p.afterVideo) {
+        afterVideoEl.src = p.afterVideo;
+      }
+      afterVideoEl.muted = true;
+      afterVideoEl.play().catch(() => {});
+    } else {
+      afterVideoEl.pause();
+      afterVideoEl.style.display = 'none';
+      afterEl.style.display = '';
+      afterEl.src = p.after;
+    }
     beforeEl.src = p.before;
     afterEl.style.objectPosition  = p.afterPos  || '';
     beforeEl.style.objectPosition = p.beforePos || '';
@@ -2422,16 +2219,17 @@
   }
   renderPager();
 
-  // ---- Slide 6: add-a-photo ----
+  // ---- Slide 6: upload 3 photos ----
   const s6Tile    = document.getElementById('s6-tile');
-  const s6Preview = document.getElementById('s6-preview');
+  const s6Slots   = document.getElementById('s6-slots');
+  const s6SlotEls = s6Slots.querySelectorAll('.slot');
   const s6Cta     = document.getElementById('s6-cta');
   const s6Sheet   = document.getElementById('s6-sheet');
   const s6Back    = document.getElementById('s6-backdrop');
+  const userPhotos = [null, null, null];
+  let userPhotoUrl = null; // first photo also used on the analyze screen
 
   function openS6Sheet() {
-    // Only open the sheet when the tile is empty — once filled, the tile
-    // itself acts as a "change photo" trigger for the same sheet.
     s6Back.classList.add('show');
     requestAnimationFrame(() => s6Sheet.classList.add('show'));
   }
@@ -2439,18 +2237,40 @@
     s6Sheet.classList.remove('show');
     setTimeout(() => s6Back.classList.remove('show'), 260);
   }
-  let userPhotoUrl = null;
   function onS6File(e) {
-    const f = e.target.files && e.target.files[0];
-    if (!f) return;
-    userPhotoUrl = URL.createObjectURL(f);
-    s6Preview.src = userPhotoUrl;
-    s6Tile.classList.add('filled');
-    s6Cta.classList.remove('not-ready');
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    // Fill the first empty slots with the new files, up to 3 total
+    for (const f of files) {
+      const emptyIdx = userPhotos.findIndex(p => !p);
+      if (emptyIdx < 0) break;
+      userPhotos[emptyIdx] = URL.createObjectURL(f);
+    }
+    renderS6Slots();
     closeS6Sheet();
-    // reset both inputs so re-picking the same file still fires change
     document.getElementById('s6-camera').value = '';
     document.getElementById('s6-file').value = '';
+  }
+  function renderS6Slots() {
+    const anyFilled = userPhotos.some(Boolean);
+    const allFilled = userPhotos.every(Boolean);
+    // show slots once the user has picked at least one; keep the big "+" tile
+    // in view until then
+    s6Tile.hidden = anyFilled;
+    s6Slots.hidden = !anyFilled;
+    userPhotos.forEach((url, i) => {
+      const slot = s6SlotEls[i];
+      const img  = slot.querySelector('img');
+      if (url) {
+        img.src = url;
+        slot.classList.add('filled');
+      } else {
+        img.removeAttribute('src');
+        slot.classList.remove('filled');
+      }
+    });
+    userPhotoUrl = userPhotos[0] || null;
+    s6Cta.classList.toggle('not-ready', !allFilled);
   }
   function onS6Continue() {
     if (s6Cta.classList.contains('not-ready')) return;
@@ -2512,13 +2332,13 @@
   }
 
   // ---- Slide 5: hair / strength / vibe pickers + Continue validation ----
-  const s5State = { hair: null, strength: null, vibe: null };
+  const s5State = { shape: null, hair: null, strength: null, vibe: null };
   const s5Cta   = document.getElementById('s5-cta');
   const s5Toast = document.getElementById('s5-toast');
   let s5ToastTimer = null;
 
   function s5Ready() {
-    return s5State.hair && s5State.strength && s5State.vibe;
+    return s5State.shape && s5State.hair && s5State.strength && s5State.vibe;
   }
   function s5Refresh() {
     if (s5Ready()) s5Cta.classList.remove('not-ready');
@@ -2562,21 +2382,19 @@
     s5State.vibe = btn.dataset.vibe;
     s5Refresh();
   }
-
-  // ---- Slide 3: face shape picker ----
-  let selectedShape = null;
-  const s3Cta = document.getElementById('s3-cta');
-  function pickShape(btn) {
-    document.querySelectorAll('.s3 .shape-card').forEach(c => {
+  function pickShapeS5(btn) {
+    document.querySelectorAll('.s5 .shape-card').forEach(c => {
       c.classList.remove('active');
       c.setAttribute('aria-checked', 'false');
     });
     btn.classList.add('active');
     btn.setAttribute('aria-checked', 'true');
-    selectedShape = btn.dataset.shape;
-    s3Cta.disabled = false;
+    s5State.shape = btn.dataset.shape;
+    s5Refresh();
     btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
   }
+
+  // (face shape picker now lives inside slide 5 only — see pickShapeS5 above)
 </script>
 </body>
 </html>
