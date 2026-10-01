@@ -2114,6 +2114,17 @@
       // defer so any DOM swap paints first
       setTimeout(() => { try { startAnalyze(); } catch (_) {} }, 30);
     }
+    // slide 2's after-video needs an explicit play() once the element is
+    // actually on screen — browsers won't autoplay a <video> in display:none
+    if (slides[idx] && slides[idx].classList.contains('s2')) {
+      setTimeout(() => {
+        try {
+          if (typeof renderPair === 'function') renderPair();
+          const v = document.getElementById('s2-after-video');
+          if (v && v.style.display !== 'none') { v.muted = true; v.play().catch(() => {}); }
+        } catch (_) {}
+      }, 30);
+    }
   }
   function next() { if (idx < total - 1) { idx++; render(); } }
   function prev() { if (idx > 0) { idx--; render(); } }
