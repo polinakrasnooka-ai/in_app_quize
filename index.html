@@ -1258,19 +1258,56 @@
   .s7 .photo-wrap .stack-card.c2 { transform: rotate(-2deg)  translate(0%, -3%);  z-index: 2; }
   .s7 .photo-wrap .stack-card.c3 { transform: rotate(8deg)   translate(8%, 4%);   z-index: 3; }
 
-  /* Percentage counter above/below the stack */
+  /* Percentage counter centered on top of the stack */
   .s7 .photo-wrap .pct {
     position: absolute;
-    bottom: -4px;
-    left: 0; right: 0;
+    inset: 0;
+    display: grid;
+    place-items: center;
     text-align: center;
-    font-size: 54px;
+    font-size: 64px;
     font-weight: 800;
     color: #fff;
     letter-spacing: -0.02em;
-    text-shadow: 0 4px 30px rgba(0,0,0,0.6);
+    text-shadow: 0 4px 30px rgba(0,0,0,0.75), 0 0 24px rgba(0,0,0,0.55);
     font-variant-numeric: tabular-nums;
     z-index: 10;
+    pointer-events: none;
+  }
+
+  /* Scanning beam that sweeps across the top card */
+  .s7 .photo-wrap .stack-card.c3 { position: relative; }
+  .s7 .photo-wrap .stack-card.c3::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(180deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.22) 50%,
+      rgba(255,255,255,0) 100%);
+    filter: blur(2px);
+    animation: s7scan 2.4s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+    pointer-events: none;
+    z-index: 2;
+  }
+  @keyframes s7scan {
+    0%   { top: -40%; opacity: 0.9; }
+    50%  { opacity: 1; }
+    100% { top: 100%;  opacity: 0.9; }
+  }
+  /* Subtle thirds grid on the top card so it reads as "being analyzed" */
+  .s7 .photo-wrap .stack-card.c3::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, transparent 32.5%, rgba(255,255,255,0.14) 33%, rgba(255,255,255,0.14) 33.6%, transparent 34%),
+      linear-gradient(90deg, transparent 65.5%, rgba(255,255,255,0.14) 66%, rgba(255,255,255,0.14) 66.6%, transparent 67%),
+      linear-gradient(180deg, transparent 32.5%, rgba(255,255,255,0.14) 33%, rgba(255,255,255,0.14) 33.6%, transparent 34%),
+      linear-gradient(180deg, transparent 65.5%, rgba(255,255,255,0.14) 66%, rgba(255,255,255,0.14) 66.6%, transparent 67%);
+    pointer-events: none;
+    z-index: 1;
   }
 
   .s7 .all-set {
